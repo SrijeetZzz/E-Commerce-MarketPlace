@@ -7,6 +7,9 @@ const adminRoutes = require("../modules/admin/admin.routes");
 const bankRoutes = require("../modules/bank/bank.routes");
 const productRoutes = require("../modules/products/product.routes");
 const listingRoutes = require("../modules/listings/listing.routes");
+const cartRoutes = require("../modules/cart/cart.routes");
+const orderRoutes = require("../modules/orders/order.routes");
+
 
 
 router.use("/auth", authRoutes);
@@ -15,6 +18,8 @@ router.use("/admin", adminRoutes);
 router.use("/seller", bankRoutes);
 router.use("/admin/products", productRoutes);
 router.use("/seller", listingRoutes);
+router.use("/cart", cartRoutes);
+router.use("/", orderRoutes);
 
 
 module.exports = router;
