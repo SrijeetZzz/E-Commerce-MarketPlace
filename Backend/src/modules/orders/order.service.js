@@ -73,7 +73,49 @@ const checkout = async (userId) => {
     throw error;
   }
 };
+const processPayment = async (orderId, isSuccess) => {
+  const order = await Order.findById(orderId);
+
+  if (!order) throw new Error("Order not found");
+
+  if (order.status !== "PLACED") {
+    throw new Error("Order already processed");
+  }
+
+  try {
+    if (isSuccess) {
+      // ✅ CONFIRM STOCK
+      for (const item of order.items) {
+        await inventoryService.confirmStock(
+          item.listingId,
+          item.quantity
+        );
+      }
+
+      order.status = "CONFIRMED";
+
+    } else {
+      // ❌ RELEASE STOCK
+      for (const item of order.items) {
+        await inventoryService.releaseStock(
+          item.listingId,
+          item.quantity
+        );
+      }
+
+      order.status = "CANCELLED";
+    }
+
+    await order.save();
+
+    return order;
+
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
   checkout,
+   processPayment,
 };

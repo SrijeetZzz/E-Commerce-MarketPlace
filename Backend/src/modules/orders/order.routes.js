@@ -9,5 +9,6 @@ const authMiddleware = require("../../shared/middlewares/auth.middleware");
 router.use(authMiddleware);
 
 router.post("/checkout", orderController.checkout);
+router.post("/orders/:id/payment", orderController.processPayment);
 
 module.exports = router;
