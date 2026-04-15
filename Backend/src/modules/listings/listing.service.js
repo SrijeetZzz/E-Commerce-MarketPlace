@@ -67,10 +67,66 @@ const rejectListing = async (id, reason) => {
   return listing;
 };
 
+const searchListings = async (queryParams) => {
+  const {
+    q,
+    category,
+    minPrice,
+    maxPrice,
+    page = 1,
+    limit = 10,
+  } = queryParams;
+
+  const filter = {
+    status: "ACTIVE",
+  };
+
+  // 🔥 PRICE FILTER
+  if (minPrice || maxPrice) {
+    filter.price = {};
+    if (minPrice) filter.price.$gte = Number(minPrice);
+    if (maxPrice) filter.price.$lte = Number(maxPrice);
+  }
+
+  // 🔥 BASE QUERY
+  let query = Listing.find(filter).populate("productId");
+
+  // 🔥 SEARCH BY TITLE (from product)
+  if (q) {
+    query = query.populate({
+      path: "productId",
+      match: {
+        title: { $regex: q, $options: "i" },
+      },
+    });
+  }
+
+  // 🔥 CATEGORY FILTER
+  if (category) {
+    query = query.populate({
+      path: "productId",
+      match: {
+        category: category,
+      },
+    });
+  }
+
+  // 🔥 PAGINATION
+  const skip = (page - 1) * limit;
+
+  const results = await query.skip(skip).limit(Number(limit));
+
+  // 🔥 REMOVE NULL POPULATED (important)
+  const filtered = results.filter(r => r.productId);
+
+  return filtered;
+};
+
 module.exports = {
   createListing,
   getMyListings,
   getAllListings,
   approveListing,
   rejectListing,
+  searchListings ,
 };

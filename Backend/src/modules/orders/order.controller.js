@@ -37,8 +37,30 @@ const processPayment = async (req, res) => {
     });
   }
 };
+const getMyOrders = async (req, res) => {
+  try {
+    const data = await orderService.getMyOrders(req.user.id);
+    res.json({ data });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const getOrderById = async (req, res) => {
+  try {
+    const data = await orderService.getOrderById(
+      req.user.id,
+      req.params.id
+    );
+    res.json({ data });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 module.exports = {
   checkout,
   processPayment,
+  getMyOrders,
+  getOrderById,
 };

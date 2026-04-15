@@ -86,6 +86,19 @@ const reject = async (req, res) => {
   }
 };
 
+const search = async (req, res) => {
+  try {
+    const data = await listingService.searchListings(req.query);
+
+    res.json({ data });
+
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   // seller
   create,
@@ -95,4 +108,5 @@ module.exports = {
   getAll,
   approve,
   reject,
+  search,
 };

@@ -10,5 +10,7 @@ router.use(authMiddleware);
 
 router.post("/checkout", orderController.checkout);
 router.post("/orders/:id/payment", orderController.processPayment);
+router.get("/orders", orderController.getMyOrders);
+router.get("/orders/:id", orderController.getOrderById);
 
 module.exports = router;

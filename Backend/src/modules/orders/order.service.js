@@ -113,9 +113,30 @@ const processPayment = async (orderId, isSuccess) => {
   } catch (error) {
     throw error;
   }
+};// 🔥 GET ALL ORDERS (for logged-in user)
+const getMyOrders = async (userId) => {
+  return await Order.find({ buyerId: userId })
+    .populate("items.listingId")
+    .sort({ createdAt: -1 });
+};
+
+// 🔥 GET SINGLE ORDER
+const getOrderById = async (userId, orderId) => {
+  const order = await Order.findOne({
+    _id: orderId,
+    buyerId: userId,
+  }).populate("items.listingId");
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  return order;
 };
 
 module.exports = {
   checkout,
    processPayment,
+   getOrderById,
+   getMyOrders,
 };

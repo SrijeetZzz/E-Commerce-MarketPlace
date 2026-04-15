@@ -22,4 +22,6 @@ router.get(
   listingController.getMy
 );
 
+router.get("/search", listingController.search);
+
 module.exports = router;
