@@ -35,7 +35,30 @@ const getAll = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  try {
+    const { q, minPrice, maxPrice } = req.query;
+
+    const data = await productService.searchProducts({
+      q,
+      minPrice,
+      maxPrice,
+    });
+
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to search products",
+    });
+  }
+};
 module.exports = {
   create,
   getAll,
+  searchProducts,
 };

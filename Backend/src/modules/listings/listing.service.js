@@ -67,59 +67,87 @@ const rejectListing = async (id, reason) => {
   return listing;
 };
 
-const searchListings = async (queryParams) => {
-  const {
-    q,
-    category,
-    minPrice,
-    maxPrice,
-    page = 1,
-    limit = 10,
-  } = queryParams;
+const mongoose = require("mongoose");
 
-  const filter = {
+const searchListings = async ({
+  q,
+  categoryId,
+  subCategoryId,
+  minPrice,
+  maxPrice,
+  page = 1,
+  limit = 10,
+}) => {
+  const matchStage = {
     status: "ACTIVE",
   };
 
-  // 🔥 PRICE FILTER
+  // 💰 price filter
   if (minPrice || maxPrice) {
-    filter.price = {};
-    if (minPrice) filter.price.$gte = Number(minPrice);
-    if (maxPrice) filter.price.$lte = Number(maxPrice);
+    matchStage.price = {};
+    if (minPrice) matchStage.price.$gte = Number(minPrice);
+    if (maxPrice) matchStage.price.$lte = Number(maxPrice);
   }
 
-  // 🔥 BASE QUERY
-  let query = Listing.find(filter).populate("productId");
+  const pipeline = [
+    { $match: matchStage },
 
-  // 🔥 SEARCH BY TITLE (from product)
-  if (q) {
-    query = query.populate({
-      path: "productId",
-      match: {
-        title: { $regex: q, $options: "i" },
+    // join product
+    {
+      $lookup: {
+        from: "products",
+        localField: "productId",
+        foreignField: "_id",
+        as: "product",
       },
-    });
-  }
+    },
+    { $unwind: "$product" },
 
-  // 🔥 CATEGORY FILTER
-  if (category) {
-    query = query.populate({
-      path: "productId",
-      match: {
-        category: category,
+    // join category
+    {
+      $lookup: {
+        from: "categories",
+        localField: "product.categoryId",
+        foreignField: "_id",
+        as: "category",
       },
-    });
-  }
+    },
+    { $unwind: "$category" },
 
-  // 🔥 PAGINATION
-  const skip = (page - 1) * limit;
+    // join subcategory
+    {
+      $lookup: {
+        from: "subcategories",
+        localField: "product.subCategoryId",
+        foreignField: "_id",
+        as: "subCategory",
+      },
+    },
+    { $unwind: "$subCategory" },
 
-  const results = await query.skip(skip).limit(Number(limit));
+    // filters
+    {
+      $match: {
+        ...(q && {
+          "product.title": { $regex: q, $options: "i" },
+        }),
 
-  // 🔥 REMOVE NULL POPULATED (important)
-  const filtered = results.filter(r => r.productId);
+        ...(categoryId && {
+          "category._id": new mongoose.Types.ObjectId(categoryId),
+        }),
 
-  return filtered;
+        ...(subCategoryId && {
+          "subCategory._id": new mongoose.Types.ObjectId(subCategoryId),
+        }),
+      },
+    },
+
+    // pagination
+    { $skip: (page - 1) * limit },
+    { $limit: Number(limit) },
+  ];
+
+  return await Listing.aggregate(pipeline);
 };
 
 module.exports = {

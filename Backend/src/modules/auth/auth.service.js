@@ -5,8 +5,11 @@ const jwt = require("jsonwebtoken");
 const registerUser = async (data) => {
   const { name, email, password } = data;
 
+  // normalize email (important)
+  const normalizedEmail = email.toLowerCase();
+
   // check existing user
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
     throw new Error("User already exists");
   }
@@ -16,15 +19,27 @@ const registerUser = async (data) => {
 
   const user = await User.create({
     name,
-    email,
+    email: normalizedEmail,
     password: hashedPassword,
   });
 
-  return user;
+  // 🔥 GENERATE TOKEN (THIS WAS MISSING)
+  const token = jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
+  return {
+    user,
+    token,
+  };
 };
 
 const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email });
+  const normalizedEmail = email.toLowerCase();
+
+  const user = await User.findOne({ email: normalizedEmail });
 
   if (!user) {
     throw new Error("User not found");

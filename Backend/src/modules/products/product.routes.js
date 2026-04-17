@@ -7,6 +7,9 @@ const productController = require("./product.controller");
 const authMiddleware = require("../../shared/middlewares/auth.middleware");
 const authorizeRoles = require("../../shared/middlewares/role.middleware");
 
+
+router.get("/search", productController.searchProducts);
+
 // admin only
 router.post(
   "/",
