@@ -14,7 +14,7 @@ import {
 
 import { Slider } from "@/components/ui/slider";
 
-const FilterSidebar = ({ priceBounds }: any) => {
+const FilterSidebar = ({ priceBounds, onApply }: any) => {
   const router = useRouter();
   const params = useSearchParams();
   const routeParams = useParams();
@@ -30,10 +30,9 @@ const FilterSidebar = ({ priceBounds }: any) => {
 
   const [range, setRange] = useState<[number, number]>(getInitialRange());
   const [sort, setSort] = useState(initialSort);
-
   const [categories, setCategories] = useState([]);
 
-  // 🔥 SYNC
+  // 🔥 SYNC URL → STATE
   useEffect(() => {
     if (!priceBounds) return;
 
@@ -48,8 +47,12 @@ const FilterSidebar = ({ priceBounds }: any) => {
   // 🔥 FETCH CATEGORIES
   useEffect(() => {
     const fetchCategories = async () => {
-      const res = await api.get("/categories");
-      setCategories(res.data || []);
+      try {
+        const res = await api.get("/categories");
+        setCategories(res.data || []);
+      } catch (err) {
+        console.error("Category fetch failed", err);
+      }
     };
 
     fetchCategories();
@@ -63,6 +66,8 @@ const FilterSidebar = ({ priceBounds }: any) => {
     query.set("sortBy", sort);
 
     router.push(`/category/${categoryId}?${query.toString()}`);
+
+    if (onApply) onApply(); // 🔥 close drawer
   };
 
   const clearFilters = () => {
@@ -72,25 +77,26 @@ const FilterSidebar = ({ priceBounds }: any) => {
   };
 
   return (
-    <div className="bg-gray-100 p-5 rounded-2xl space-y-6">
-
+    <div className="w-full max-w-[260px] sm:max-w-[280px] md:max-w-[300px] bg-gray-100 p-5 rounded-2xl space-y-6 h-fit">
       <h2 className="text-lg font-semibold">Filters</h2>
 
       {/* CATEGORY */}
-      <div>
+      <div className="w-full">
         <p className="font-medium mb-2">Category</p>
 
         <Select
           value={categoryId}
           onValueChange={(value) => router.push(`/category/${value}`)}
         >
-          <SelectTrigger>
-            <SelectValue />
+          <SelectTrigger className="w-full h-10">
+            <span className="block w-full truncate">
+              <SelectValue />
+            </span>
           </SelectTrigger>
 
-          <SelectContent>
+          <SelectContent className="max-w-[260px]">
             {categories.map((cat: any) => (
-              <SelectItem key={cat._id} value={cat._id}>
+              <SelectItem key={cat._id} value={cat._id} className="truncate">
                 {cat.name}
               </SelectItem>
             ))}
@@ -99,25 +105,35 @@ const FilterSidebar = ({ priceBounds }: any) => {
       </div>
 
       {/* SORT */}
-      <div>
+      <div className="w-full">
         <p className="font-medium mb-2">Sort By</p>
 
         <Select value={sort} onValueChange={setSort}>
-          <SelectTrigger>
-            <SelectValue />
+          <SelectTrigger className="w-full h-10">
+            <span className="block w-full truncate">
+              <SelectValue />
+            </span>
           </SelectTrigger>
 
-          <SelectContent>
-            <SelectItem value="price_asc">Price: Low → High</SelectItem>
-            <SelectItem value="price_desc">Price: High → Low</SelectItem>
-            <SelectItem value="newest">Newest</SelectItem>
-            <SelectItem value="popularity">Most Popular</SelectItem>
+          <SelectContent className="max-w-[260px]">
+            <SelectItem value="price_asc" className="truncate">
+              Price: Low → High
+            </SelectItem>
+            <SelectItem value="price_desc" className="truncate">
+              Price: High → Low
+            </SelectItem>
+            <SelectItem value="newest" className="truncate">
+              Newest
+            </SelectItem>
+            <SelectItem value="popularity" className="truncate">
+              Most Popular
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* PRICE */}
-      <div>
+      <div className="w-full">
         <p className="font-medium mb-2">Price Range</p>
 
         <Slider
@@ -129,25 +145,27 @@ const FilterSidebar = ({ priceBounds }: any) => {
         />
 
         <div className="flex justify-between text-sm mt-2">
-          <span>₹{range[0]}</span>
-          <span>₹{range[1]}</span>
+          <span className="truncate">₹{range[0]}</span>
+          <span className="truncate">₹{range[1]}</span>
         </div>
       </div>
 
-      <button
-        onClick={applyFilters}
-        className="w-full bg-black text-white py-2 rounded-lg"
-      >
-        Apply Filters
-      </button>
+      {/* ACTIONS */}
+      <div className="space-y-3">
+        <button
+          onClick={applyFilters}
+          className="w-full bg-black text-white py-2 rounded-lg"
+        >
+          Apply Filters
+        </button>
 
-      <button
-        onClick={clearFilters}
-        className="text-purple-600 text-sm"
-      >
-        Clear all filters
-      </button>
-
+        <button
+          onClick={clearFilters}
+          className="w-full text-purple-600 text-sm text-left"
+        >
+          Clear all filters
+        </button>
+      </div>
     </div>
   );
 };

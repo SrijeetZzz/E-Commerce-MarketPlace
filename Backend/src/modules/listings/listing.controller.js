@@ -20,7 +20,24 @@ const create = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+const createBulk = async (req, res) => {
+  try {
+    const sellerId = req.user.id; // or hardcode for now
+    const listings = req.body.listings;
 
+    const result = await listingService.createBulkListings(
+      sellerId,
+      listings
+    );
+
+    res.json({
+      message: "Bulk listings processed",
+      data: result,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 // get my listings
 const getMy = async (req, res) => {
   try {
@@ -103,6 +120,7 @@ module.exports = {
   // seller
   create,
   getMy,
+  createBulk,
 
   // admin
   getAll,

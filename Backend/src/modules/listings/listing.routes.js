@@ -22,6 +22,13 @@ router.get(
   listingController.getMy
 );
 
+router.post(
+  "/listings/bulk",
+  authMiddleware,
+  authorizeRoles("SELLER"),
+  listingController.createBulk
+);
+
 router.get("/search", listingController.search);
 
 module.exports = router;
