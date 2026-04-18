@@ -72,25 +72,26 @@ const FilterSidebar = ({ priceBounds }: any) => {
   };
 
   return (
-    <div className="bg-gray-100 p-5 rounded-2xl space-y-6">
-
+    <div className="w-full max-w-xs bg-gray-100 p-5 rounded-2xl space-y-6 h-fit">
       <h2 className="text-lg font-semibold">Filters</h2>
 
       {/* CATEGORY */}
-      <div>
+      <div className="w-full">
         <p className="font-medium mb-2">Category</p>
 
         <Select
           value={categoryId}
           onValueChange={(value) => router.push(`/category/${value}`)}
         >
-          <SelectTrigger>
-            <SelectValue />
+          <SelectTrigger className="w-full h-10">
+            <span className="block truncate w-full">
+              <SelectValue />
+            </span>
           </SelectTrigger>
 
           <SelectContent>
             {categories.map((cat: any) => (
-              <SelectItem key={cat._id} value={cat._id}>
+              <SelectItem key={cat._id} value={cat._id} className="truncate">
                 {cat.name}
               </SelectItem>
             ))}
@@ -141,13 +142,9 @@ const FilterSidebar = ({ priceBounds }: any) => {
         Apply Filters
       </button>
 
-      <button
-        onClick={clearFilters}
-        className="text-purple-600 text-sm"
-      >
+      <button onClick={clearFilters} className="text-purple-600 text-sm">
         Clear all filters
       </button>
-
     </div>
   );
 };

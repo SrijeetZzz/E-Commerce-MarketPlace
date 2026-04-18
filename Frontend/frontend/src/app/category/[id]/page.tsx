@@ -81,21 +81,35 @@ const CategoryPage = () => {
     router.push(`/category/${categoryId}?${query.toString()}`);
   };
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <SubCategoryTabs
-        subcategories={subcategories}
-        active={subCategoryId}
-        setActive={handleSubChange}
-      />
-
-      <div className="flex gap-6 mt-6">
-        <FilterSidebar priceBounds={priceBounds}/>
-
-        <ProductGrid products={products} />
-      </div>
+ return (
+  <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
+    
+    {/* LEFT SIDE (FILTER) */}
+    <div className="w-72 shrink-0">
+      <FilterSidebar priceBounds={priceBounds} />
     </div>
-  );
+
+    {/* RIGHT SIDE */}
+    <div className="flex-1 flex flex-col">
+
+      {/* TOP SECTION */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold mb-4">
+          Category Name {/* replace with real name later */}
+        </h1>
+
+        <SubCategoryTabs
+          subcategories={subcategories}
+          active={subCategoryId}
+          setActive={handleSubChange}
+        />
+      </div>
+
+      {/* BOTTOM SECTION */}
+      <ProductGrid products={products} />
+    </div>
+  </div>
+);
 };
 
 export default CategoryPage;
