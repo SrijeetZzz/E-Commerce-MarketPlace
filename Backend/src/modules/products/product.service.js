@@ -2,9 +2,9 @@
 
 const Product = require("./product.model");
 const productRepository = require("./product.repository");
-
 const Category = require("../categories/category.model");
 const SubCategory = require("../categories/subcategory.model");
+const Listing = require("../listings/listing.model");
 
 const createProduct = async (adminId, data) => {
   const {
@@ -65,6 +65,41 @@ const createProduct = async (adminId, data) => {
   return product;
 };
 
+const getProductById = async (productId) => {
+  // 🔍 Validate ID (basic safety)
+  if (!productId) {
+    throw new Error("Product ID is required");
+  }
+
+  // 🧱 Get product
+  const product = await Product.findById(productId).lean();
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  // 🛒 Get active listings (VERY IMPORTANT)
+  const listings = await Listing.find({
+    productId,
+    status: "ACTIVE",
+  })
+    .populate("sellerId", "name") // optional but useful
+    .lean();
+
+  // 🧠 Attach sellerName (clean frontend data)
+  const formattedListings = listings.map((l) => ({
+    _id: l._id,
+    price: l.price,
+    stock: l.stock,
+    sellerName: l.sellerId?.name || "Seller",
+  }));
+
+  return {
+    ...product,
+    listings: formattedListings,
+  };
+};
+
 const getAllProducts = async () => {
   return await Product.find();
 };
@@ -76,4 +111,5 @@ module.exports = {
   createProduct,
   getAllProducts,
   searchProducts,
+  getProductById,
 };

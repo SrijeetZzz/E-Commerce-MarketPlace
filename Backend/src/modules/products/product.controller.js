@@ -32,6 +32,21 @@ const getAll = async (req, res) => {
     });
   }
 };
+const getById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await productService.getProductById(id);
+
+    res.status(200).json({
+      data: product,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
 
 const searchProducts = async (req, res) => {
   try {
@@ -73,4 +88,5 @@ module.exports = {
   create,
   getAll,
   searchProducts,
+  getById,
 };
