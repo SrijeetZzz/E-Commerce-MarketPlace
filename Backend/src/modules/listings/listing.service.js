@@ -2,6 +2,7 @@
 
 const Listing = require("./listing.model");
 const Product = require("../products/product.model");
+const mongoose = require("mongoose");
 
 const createListing = async (sellerId, data) => {
   const { productId, price, stock } = data;
@@ -31,6 +32,66 @@ const createListing = async (sellerId, data) => {
       approvalReason: "Price out of allowed range",
     });
   }
+};
+
+const createBulkListings = async (sellerId, listingsData) => {
+  if (!Array.isArray(listingsData) || listingsData.length === 0) {
+    throw new Error("Invalid listings data");
+  }
+
+  const results = [];
+
+  for (const data of listingsData) {
+    try {
+      const { productId, price, stock } = data;
+
+      const product = await Product.findById(productId);
+
+      if (!product) {
+        results.push({
+          ...data,
+          status: "FAILED",
+          reason: "Product not found",
+        });
+        continue;
+      }
+
+      let listing;
+
+      // 🔥 reuse your core validation
+      if (
+        price >= product.priceRange.min &&
+        price <= product.priceRange.max
+      ) {
+        listing = await Listing.create({
+          productId,
+          sellerId,
+          price,
+          stock,
+          status: "ACTIVE",
+        });
+      } else {
+        listing = await Listing.create({
+          productId,
+          sellerId,
+          price,
+          stock,
+          status: "PENDING_APPROVAL",
+          approvalReason: "Price out of allowed range",
+        });
+      }
+
+      results.push(listing);
+    } catch (err) {
+      results.push({
+        ...data,
+        status: "FAILED",
+        reason: err.message,
+      });
+    }
+  }
+
+  return results;
 };
 
 const getMyListings = async (sellerId) => {
@@ -67,7 +128,7 @@ const rejectListing = async (id, reason) => {
   return listing;
 };
 
-const mongoose = require("mongoose");
+
 
 const searchListings = async ({
   q,
@@ -157,4 +218,5 @@ module.exports = {
   approveListing,
   rejectListing,
   searchListings ,
+  createBulkListings,
 };

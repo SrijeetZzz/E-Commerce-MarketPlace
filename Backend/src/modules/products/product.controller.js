@@ -84,9 +84,42 @@ const searchProducts = async (req, res) => {
     });
   }
 };
+
+
+
+const createBulk = async (req, res) => {
+  try {
+    const adminId = req.user.id; // from auth
+    const products = req.body.products;
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({
+        message: "Products array is required",
+      });
+    }
+
+    const result = await productService.createBulkProducts(
+      adminId,
+      products
+    );
+
+    return res.status(201).json({
+      message: "Bulk products processed",
+      data: result,
+    });
+  } catch (err) {
+    console.error("Bulk product error:", err);
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+
 module.exports = {
   create,
   getAll,
   searchProducts,
   getById,
+  createBulk,
 };

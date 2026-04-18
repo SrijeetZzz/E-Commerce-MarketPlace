@@ -24,6 +24,14 @@ router.get(
   authorizeRoles("ADMIN"),
   productController.getAll
 );
+
+router.post(
+  "/bulk",
+  authMiddleware,
+  authorizeRoles("ADMIN"),
+  productController.createBulk
+);
+
 router.get("/:id", productController.getById);
 
 

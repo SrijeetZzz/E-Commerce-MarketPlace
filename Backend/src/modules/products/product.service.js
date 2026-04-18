@@ -106,10 +106,77 @@ const getAllProducts = async () => {
 const searchProducts = async (filters) => {
   return await productRepository.getGroupedProducts(filters);
 };
+const createBulkProducts = async (adminId, productsData) => {
+  if (!Array.isArray(productsData) || productsData.length === 0) {
+    throw new Error("Invalid products data");
+  }
+
+  const results = [];
+
+  for (const data of productsData) {
+    try {
+      const {
+        title,
+        description,
+        brand,
+        categoryId,
+        subCategoryId,
+        images,
+        attributes,
+        tags,
+        priceRange,
+      } = data;
+
+      // 🔥 validations (reuse logic)
+      if (!title) throw new Error("Title is required");
+      if (!categoryId || !subCategoryId)
+        throw new Error("Category and SubCategory required");
+
+      if (!priceRange || priceRange.min == null || priceRange.max == null)
+        throw new Error("Price range required");
+
+      if (priceRange.max < priceRange.min)
+        throw new Error("Invalid price range");
+
+      const category = await Category.findById(categoryId);
+      if (!category) throw new Error("Invalid category");
+
+      const subCategory = await SubCategory.findById(subCategoryId);
+      if (!subCategory) throw new Error("Invalid subcategory");
+
+      if (subCategory.categoryId.toString() !== categoryId)
+        throw new Error("Subcategory mismatch");
+
+      const product = await Product.create({
+        title,
+        description,
+        brand,
+        categoryId,
+        subCategoryId,
+        images,
+        attributes,
+        tags,
+        priceRange,
+        createdBy: adminId,
+      });
+
+      results.push(product);
+    } catch (err) {
+      results.push({
+        ...data,
+        status: "FAILED",
+        reason: err.message,
+      });
+    }
+  }
+
+  return results;
+};
 
 module.exports = {
   createProduct,
   getAllProducts,
   searchProducts,
   getProductById,
+  createBulkProducts,
 };
