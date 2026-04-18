@@ -16,7 +16,7 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ✅ FIX: tell TS what you're returning
+
 api.interceptors.response.use(
   (response) => response.data as any, // 👈 TEMP FIX (important)
   (error) => {

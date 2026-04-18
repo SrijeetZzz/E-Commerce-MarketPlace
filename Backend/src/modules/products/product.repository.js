@@ -7,23 +7,76 @@ exports.getGroupedProducts = async ({
   maxPrice,
   categoryId,
   subCategoryId,
+  sortBy = "price_asc",
+  page = 1,
+  limit = 10,
 }) => {
+  const isValidObjectId = (id) =>
+    mongoose.Types.ObjectId.isValid(id);
+
+  // 🚨 STRICT INPUT SANITIZATION
+  const validCategoryId =
+    categoryId && isValidObjectId(categoryId)
+      ? new mongoose.Types.ObjectId(categoryId)
+      : null;
+
+  const validSubCategoryId =
+    subCategoryId && isValidObjectId(subCategoryId)
+      ? new mongoose.Types.ObjectId(subCategoryId)
+      : null;
+
+  // 🚨 FORCE CONSISTENCY (NO MISMATCH ALLOWED)
+  if (subCategoryId && !validSubCategoryId) {
+    throw new Error("Invalid subCategoryId");
+  }
+
+  if (categoryId && !validCategoryId) {
+    throw new Error("Invalid categoryId");
+  }
+
+  // 🔥 BASE MATCH
   const matchStage = {
     status: "ACTIVE",
   };
 
-  // 💰 price filter (listing level)
   if (minPrice || maxPrice) {
     matchStage.price = {};
     if (minPrice) matchStage.price.$gte = Number(minPrice);
     if (maxPrice) matchStage.price.$lte = Number(maxPrice);
   }
 
+  // 🔥 PRODUCT FILTER (NO SILENT FAIL)
+  const productMatch = {};
+
+  if (q) {
+    productMatch["product.title"] = {
+      $regex: q,
+      $options: "i",
+    };
+  }
+
+  if (validCategoryId) {
+    productMatch["product.categoryId"] = validCategoryId;
+  }
+
+  if (validSubCategoryId) {
+    productMatch["product.subCategoryId"] = validSubCategoryId;
+  }
+
+  // 🚀 SORT
+  let sortStage = { minPrice: 1 };
+
+  if (sortBy === "price_desc") sortStage = { minPrice: -1 };
+  if (sortBy === "newest") sortStage = { createdAt: -1 };
+  if (sortBy === "popularity") sortStage = { totalListings: -1 };
+
+  const skip = (Number(page) - 1) * Number(limit);
+
   const pipeline = [
-    // 1️⃣ match listings (FAST)
+    // 1️⃣ LISTING FILTER
     { $match: matchStage },
 
-    // 2️⃣ join product
+    // 2️⃣ JOIN PRODUCT
     {
       $lookup: {
         from: "products",
@@ -34,7 +87,15 @@ exports.getGroupedProducts = async ({
     },
     { $unwind: "$product" },
 
-    // 3️⃣ lookup category
+    // 🚨 STRICT MATCH (ALWAYS APPLIED)
+    {
+      $match:
+        Object.keys(productMatch).length > 0
+          ? productMatch
+          : {},
+    },
+
+    // 3️⃣ CATEGORY (DISPLAY ONLY)
     {
       $lookup: {
         from: "categories",
@@ -43,9 +104,9 @@ exports.getGroupedProducts = async ({
         as: "category",
       },
     },
-    { $unwind: "$category" },
+    { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
 
-    // 4️⃣ lookup subcategory
+    // 4️⃣ SUBCATEGORY (DISPLAY ONLY)
     {
       $lookup: {
         from: "subcategories",
@@ -54,26 +115,9 @@ exports.getGroupedProducts = async ({
         as: "subCategory",
       },
     },
-    { $unwind: "$subCategory" },
+    { $unwind: { path: "$subCategory", preserveNullAndEmptyArrays: true } },
 
-    // 5️⃣ apply filters (AFTER lookup)
-    {
-      $match: {
-        ...(q && {
-          "product.title": { $regex: q, $options: "i" },
-        }),
-
-        ...(categoryId && {
-          "category._id": new mongoose.Types.ObjectId(categoryId),
-        }),
-
-        ...(subCategoryId && {
-          "subCategory._id": new mongoose.Types.ObjectId(subCategoryId),
-        }),
-      },
-    },
-
-    // 6️⃣ group by product
+    // 5️⃣ GROUP
     {
       $group: {
         _id: "$product._id",
@@ -81,6 +125,7 @@ exports.getGroupedProducts = async ({
         title: { $first: "$product.title" },
         brand: { $first: "$product.brand" },
         images: { $first: "$product.images" },
+        createdAt: { $first: "$product.createdAt" },
 
         category: { $first: "$category.name" },
         subCategory: { $first: "$subCategory.name" },
@@ -95,16 +140,61 @@ exports.getGroupedProducts = async ({
         },
 
         minPrice: { $min: "$price" },
-        maxPrice: { $max: "$price" }, // 🔥 new
-        totalListings: { $sum: 1 },   // 🔥 new
+        maxPrice: { $max: "$price" },
+        totalListings: { $sum: 1 },
       },
     },
 
-    // 7️⃣ sort
+    // 6️⃣ SORT
+    { $sort: sortStage },
+
+    // 7️⃣ PAGINATION
+    { $skip: skip },
+    { $limit: Number(limit) },
+  ];
+
+  const results = await Listing.aggregate(pipeline);
+
+  // 🔢 TOTAL COUNT
+  const totalPipeline = [
+    { $match: matchStage },
     {
-      $sort: { minPrice: 1 },
+      $lookup: {
+        from: "products",
+        localField: "productId",
+        foreignField: "_id",
+        as: "product",
+      },
+    },
+    { $unwind: "$product" },
+
+    {
+      $match:
+        Object.keys(productMatch).length > 0
+          ? productMatch
+          : {},
+    },
+
+    {
+      $group: {
+        _id: "$product._id",
+      },
+    },
+    {
+      $count: "total",
     },
   ];
 
-  return await Listing.aggregate(pipeline);
+  const totalResult = await Listing.aggregate(totalPipeline);
+  const total = totalResult[0]?.total || 0;
+
+  return {
+    data: results,
+    pagination: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
