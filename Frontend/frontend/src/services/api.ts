@@ -4,7 +4,7 @@ const api = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
-// 🔐 Attach token
+// 🔐 TOKEN
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
@@ -16,9 +16,9 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-
+// 🚨 IMPORTANT → return FULL response (your current setup)
 api.interceptors.response.use(
-  (response) => response.data as any, // 👈 TEMP FIX (important)
+  (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       console.log("Unauthorized");

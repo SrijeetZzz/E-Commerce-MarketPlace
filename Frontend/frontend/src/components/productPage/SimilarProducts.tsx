@@ -1,48 +1,67 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import api from "@/services/api";
 import { useRouter } from "next/navigation";
+import { ProductListItem } from "@/types/product";
+import { fetchProducts } from "@/services/product";
 
-const SimilarProducts = ({ product }: any) => {
+interface Props {
+  product: {
+    _id: string;
+    categoryId: string;
+    subCategoryId: string;
+  };
+}
+
+const SimilarProducts = ({ product }: Props) => {
   const router = useRouter();
 
-  const [similarProducts, setSimilarProducts] = useState<any[]>([]);
+  const [similarProducts, setSimilarProducts] = useState<ProductListItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true; // prevent state update after unmount
+
     const fetchSimilar = async () => {
-      // 🚨 PROPER GUARD (not just product)
-      if (!product?.category) {
+      if (!product?.categoryId) {
         setLoading(false);
         return;
       }
 
       try {
-        let url = `/products/search?categoryId=${product.category}`;
+        let url = `/products/search?categoryId=${product.categoryId}`;
 
-        if (product.subCategory) {
-          url += `&subCategoryId=${product.subCategory}`;
+        if (product.subCategoryId) {
+          url += `&subCategoryId=${product.subCategoryId}`;
         }
 
-        const res = await api.get(url);
+        const res = await fetchProducts(url);
 
-        const filtered = (res.data || []).filter(
-          (p: any) => p._id !== product._id
+        // 🔥 SAFE ACCESS
+        const list = res?.data ?? [];
+
+        const filtered = list.filter(
+          (p) => p._id !== product._id
         );
 
-        setSimilarProducts(filtered.slice(0, 8));
+        if (isMounted) {
+          setSimilarProducts(filtered.slice(0, 8));
+        }
+
       } catch (err) {
         console.error("Similar products fetch failed", err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchSimilar();
-  }, [product?.category, product?.subCategory, product?._id]);
 
-  // 🔥 LOADING STATE
+    return () => {
+      isMounted = false;
+    };
+  }, [product._id, product.categoryId, product.subCategoryId]);
+
   if (loading) {
     return (
       <div className="mt-16">
@@ -51,10 +70,7 @@ const SimilarProducts = ({ product }: any) => {
     );
   }
 
-  // 🔥 NO DATA
-//   if (!similarProducts.length) {
-//     return null;
-//   }
+  if (!similarProducts.length) return null;
 
   return (
     <div className="mt-16">
@@ -63,14 +79,14 @@ const SimilarProducts = ({ product }: any) => {
       </h2>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {similarProducts.map((item: any) => (
+        {similarProducts.map((item) => (
           <div
             key={item._id}
-            onClick={() => router.push(`/products/${item._id}`)}
+            onClick={() => router.push(`/product/${item._id}`)}
             className="cursor-pointer border rounded-lg p-3 hover:shadow-md transition"
           >
             <img
-              src={item.images?.[0] || "/placeholder.png"}
+              src={item.images[0] || "/placeholder.png"}
               className="w-full h-40 object-cover rounded"
               alt={item.title}
             />
@@ -80,7 +96,7 @@ const SimilarProducts = ({ product }: any) => {
             </p>
 
             <p className="text-purple-600 font-semibold">
-              ₹{item.minPrice || item.price || "N/A"}
+              ₹{item.minPrice}
             </p>
           </div>
         ))}

@@ -9,7 +9,7 @@ exports.getGroupedProducts = async ({
   subCategoryId,
   sortBy = "price_asc",
   page = 1,
-  limit = 10,
+  limit = 30,
 }) => {
   const isValidObjectId = (id) =>
     mongoose.Types.ObjectId.isValid(id);
@@ -126,7 +126,8 @@ exports.getGroupedProducts = async ({
         brand: { $first: "$product.brand" },
         images: { $first: "$product.images" },
         createdAt: { $first: "$product.createdAt" },
-
+        categoryId: { $first: "$product.categoryId" },
+        subCategoryId: { $first: "$product.subCategoryId" },
         category: { $first: "$category.name" },
         subCategory: { $first: "$subCategory.name" },
 

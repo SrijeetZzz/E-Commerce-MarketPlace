@@ -16,7 +16,7 @@ const HomePage = () => {
         const res = await api.get("/categories");
 
         // 🔥 interceptor returns data directly
-        setCategories(res.data || []);
+        setCategories(res.data?.data || []);
       } catch (err) {
         console.error("Failed to fetch categories", err);
       } finally {
