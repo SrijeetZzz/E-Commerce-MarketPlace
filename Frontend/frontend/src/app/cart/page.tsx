@@ -6,16 +6,17 @@ import {
   updateCart,
   removeFromCart,
 } from "@/services/cart";
+import { Cart } from "@/types/cart";
 
 const CartPage = () => {
-  const [cart, setCart] = useState<any>(null);
+  const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
 
   // 🔥 FETCH CART
   const fetchCart = async () => {
     try {
-      const res = await getCart();
-      setCart(res.data);
+      const data = await getCart(); // ✅ already normalized
+      setCart(data);
     } catch (err) {
       console.error("Cart fetch failed", err);
     } finally {
@@ -49,18 +50,17 @@ const CartPage = () => {
     }
   };
 
-  // 🔥 LOADING STATE
+  // 🔥 LOADING
   if (loading) return <p className="p-6">Loading cart...</p>;
 
-  // 🔥 EMPTY STATE
+  // 🔥 EMPTY
   if (!cart || cart.items.length === 0) {
     return <p className="p-6">Your cart is empty</p>;
   }
 
-  // 🔥 TOTAL CALCULATION
+  // 🔥 TOTAL
   const total = cart.items.reduce(
-    (sum: number, item: any) =>
-      sum + item.priceAtAdd * item.quantity,
+    (sum, item) => sum + item.priceAtAdd * item.quantity,
     0
   );
 
@@ -70,16 +70,17 @@ const CartPage = () => {
       <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
 
       <div className="space-y-4">
-        {cart.items.map((item: any) => (
+        {cart.items.map((item) => (
           <div
-            key={item.listingId}
+            key={item._id} // ✅ FIXED KEY
             className="flex justify-between items-center border p-4 rounded-lg"
           >
             {/* LEFT */}
             <div>
               <p className="font-semibold">
-                {item.title || "Product"}
+                Product {/* you don’t have product name yet */}
               </p>
+
               <p className="text-sm text-gray-500">
                 ₹{item.priceAtAdd}
               </p>
@@ -92,7 +93,7 @@ const CartPage = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() =>
-                    handleUpdate(item.listingId, item.quantity - 1)
+                    handleUpdate(item.listing._id, item.quantity - 1)
                   }
                   className="px-2 border"
                 >
@@ -103,7 +104,7 @@ const CartPage = () => {
 
                 <button
                   onClick={() =>
-                    handleUpdate(item.listingId, item.quantity + 1)
+                    handleUpdate(item.listing._id, item.quantity + 1)
                   }
                   className="px-2 border"
                 >
@@ -113,7 +114,7 @@ const CartPage = () => {
 
               {/* REMOVE */}
               <button
-                onClick={() => handleRemove(item.listingId)}
+                onClick={() => handleRemove(item.listing._id)}
                 className="text-red-500"
               >
                 Remove

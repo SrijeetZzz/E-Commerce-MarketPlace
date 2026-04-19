@@ -49,7 +49,7 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
     const fetchCategories = async () => {
       try {
         const res = await api.get("/categories");
-        setCategories(res.data || []);
+        setCategories(res.data?.data || []);
       } catch (err) {
         console.error("Category fetch failed", err);
       }
@@ -77,7 +77,7 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
   };
 
   return (
-    <div className="w-full max-w-[260px] sm:max-w-[280px] md:max-w-[300px] bg-gray-100 p-5 rounded-2xl space-y-6 h-fit">
+    <div className="w-full max-w-65 sm:max-w-70 md:max-w-75 bg-gray-100 p-5 rounded-2xl space-y-6 h-fit">
       <h2 className="text-lg font-semibold">Filters</h2>
 
       {/* CATEGORY */}
@@ -94,7 +94,7 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
             </span>
           </SelectTrigger>
 
-          <SelectContent className="max-w-[260px]">
+          <SelectContent className="max-w-65">
             {categories.map((cat: any) => (
               <SelectItem key={cat._id} value={cat._id} className="truncate">
                 {cat.name}
@@ -115,7 +115,7 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
             </span>
           </SelectTrigger>
 
-          <SelectContent className="max-w-[260px]">
+          <SelectContent className="max-w-65">
             <SelectItem value="price_asc" className="truncate">
               Price: Low → High
             </SelectItem>

@@ -1,11 +1,18 @@
+
 "use client";
 
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import SubCategoryTabs from "@/components/page/SubCategoryTabs";
-import ProductGrid from "@/components/page/ProductGrid";
-import FilterSidebar from "@/components/page/FilterSidebar";
+import SubCategoryTabs from "@/components/category/SubCategoryTabs";
+import ProductGrid from "@/components/category/ProductGrid";
+import FilterSidebar from "@/components/category/FilterSidebar";
+import Pagination from "@/components/category/Pagination";
+
 import api from "@/services/api";
+import { fetchProducts } from "@/services/product";
+import { ProductListItem } from "@/types/product";
+
+const LIMIT = 10;
 
 const CategoryPage = () => {
   const params = useParams();
@@ -18,9 +25,12 @@ const CategoryPage = () => {
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
 
-  const [subcategories, setSubcategories] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [subcategories, setSubcategories] = useState<any[]>([]);
+  const [products, setProducts] = useState<ProductListItem[]>([]);
   const [priceBounds, setPriceBounds] = useState<[number, number]>([0, 0]);
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const [showFilters, setShowFilters] = useState(false);
 
@@ -31,7 +41,9 @@ const CategoryPage = () => {
         const res = await api.get(
           `/categories/subcategories?categoryId=${categoryId}`
         );
-        setSubcategories(res.data || []);
+
+        const payload = res?.data ?? res;
+        setSubcategories(payload.data || []);
       } catch (err) {
         console.error("Subcategory fetch failed", err);
       }
@@ -40,34 +52,51 @@ const CategoryPage = () => {
     fetchSub();
   }, [categoryId]);
 
-  // 🔥 FETCH PRODUCTS
+  // 🔥 RESET PAGE ON FILTER CHANGE
   useEffect(() => {
-    const fetchProducts = async () => {
+    setPage(1);
+  }, [categoryId, subCategoryId, minPrice, maxPrice]);
+
+  // 🔥 FETCH PRODUCTS (SERVICE BASED)
+  useEffect(() => {
+    const loadProducts = async () => {
       try {
-        let url = `/products/search?categoryId=${categoryId}`;
+        const params = new URLSearchParams();
+
+        params.set("categoryId", categoryId);
+        params.set("page", String(page));
+        params.set("limit", String(LIMIT));
 
         if (subCategoryId !== "all") {
-          url += `&subCategoryId=${subCategoryId}`;
+          params.set("subCategoryId", subCategoryId);
         }
 
-        if (minPrice) url += `&minPrice=${minPrice}`;
-        if (maxPrice) url += `&maxPrice=${maxPrice}`;
+        if (minPrice) params.set("minPrice", minPrice);
+        if (maxPrice) params.set("maxPrice", maxPrice);
 
-        const res = await api.get(url);
-        setProducts(res.data || []);
+        const res = await fetchProducts(
+          `/products/search?${params.toString()}`
+        );
 
-        if (res.data.length > 0) {
-          const min = Math.min(...res.data.map((p: any) => p.minPrice));
-          const max = Math.max(...res.data.map((p: any) => p.maxPrice));
+        const list = res.data;
+        const pagination = res.pagination;
+
+        setProducts(list);
+        setTotalPages(pagination?.totalPages || 1);
+
+        if (list.length) {
+          const min = Math.min(...list.map((p) => p.minPrice));
+          const max = Math.max(...list.map((p) => p.maxPrice));
           setPriceBounds([min, max]);
         }
+
       } catch (err) {
         console.error("Product fetch failed", err);
       }
     };
 
-    fetchProducts();
-  }, [categoryId, subCategoryId, minPrice, maxPrice]);
+    loadProducts();
+  }, [categoryId, subCategoryId, minPrice, maxPrice, page]);
 
   const handleSubChange = (subId: string) => {
     const query = new URLSearchParams(searchParams.toString());
@@ -78,11 +107,16 @@ const CategoryPage = () => {
     router.push(`/category/${categoryId}?${query.toString()}`);
   };
 
+  // 🔥 SCROLL TO TOP ON PAGE CHANGE
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page]);
+
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
 
-        {/* DESKTOP SIDEBAR */}
+        {/* LEFT FILTER */}
         <div className="hidden lg:block w-64 xl:w-72 shrink-0">
           <FilterSidebar priceBounds={priceBounds} />
         </div>
@@ -90,7 +124,7 @@ const CategoryPage = () => {
         {/* RIGHT */}
         <div className="flex-1 flex flex-col">
 
-          {/* MOBILE BUTTON */}
+          {/* MOBILE FILTER BUTTON */}
           <div className="lg:hidden mb-4">
             <button
               onClick={() => setShowFilters(true)}
@@ -103,7 +137,7 @@ const CategoryPage = () => {
           {/* TOP */}
           <div className="mb-6">
             <h1 className="text-2xl font-semibold mb-4">
-              Category Name
+              Category
             </h1>
 
             <SubCategoryTabs
@@ -115,38 +149,42 @@ const CategoryPage = () => {
 
           {/* PRODUCTS */}
           <ProductGrid products={products} />
+
+          {/* PAGINATION */}
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            setPage={setPage}
+          />
+
         </div>
       </div>
 
-      {/* 🔥 MOBILE FULL SCREEN FILTER */}
+      {/* MOBILE FILTER DRAWER */}
       <div
         className={`fixed inset-0 z-50 transition-all duration-300 ${
           showFilters ? "visible opacity-100" : "invisible opacity-0"
         }`}
       >
-        {/* BACKDROP */}
         <div
           className="absolute inset-0 bg-black/40"
           onClick={() => setShowFilters(false)}
         />
 
-        {/* SLIDE PANEL */}
         <div
           className={`absolute right-0 top-0 h-full w-full bg-white transform transition-transform duration-300 ${
             showFilters ? "translate-x-0" : "translate-x-full"
           }`}
         >
-          {/* HEADER */}
           <div className="flex items-center justify-between p-4 border-b">
             <h2 className="text-lg font-semibold">Filters</h2>
             <button onClick={() => setShowFilters(false)}>✕</button>
           </div>
 
-          {/* CONTENT */}
           <div className="p-4 overflow-y-auto h-[calc(100%-60px)]">
             <FilterSidebar
               priceBounds={priceBounds}
-              onApply={() => setShowFilters(false)} // 🔥 auto close
+              onApply={() => setShowFilters(false)}
             />
           </div>
         </div>
