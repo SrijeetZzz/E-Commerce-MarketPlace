@@ -11,7 +11,7 @@ export interface ListingInCart {
 
 export interface CartItem {
   _id: string;
-  listing: ListingInCart; // 🔥 renamed from listingId → listing
+  listing: ListingInCart; 
   quantity: number;
   priceAtAdd: number;
 }
