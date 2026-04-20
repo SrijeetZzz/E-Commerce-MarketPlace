@@ -1,7 +1,18 @@
+export interface ProductDetails {
+  _id: string;
+  title: string;
+  images: string[];
+}
+
+export interface SellerDetails {
+  _id: string;
+  name: string;
+}
+
 export interface ListingInCart {
   _id: string;
-  productId: string;
-  sellerId: string;
+  productId: ProductDetails; // Now an object
+  sellerId: SellerDetails;
   price: number;
   stock: number;
   status: "ACTIVE" | "INACTIVE";
@@ -11,7 +22,7 @@ export interface ListingInCart {
 
 export interface CartItem {
   _id: string;
-  listing: ListingInCart; 
+  listing: ListingInCart;
   quantity: number;
   priceAtAdd: number;
 }

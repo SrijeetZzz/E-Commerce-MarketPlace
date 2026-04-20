@@ -10,7 +10,10 @@ app.use(cors({
 
 app.use(express.json());
 
+app.use("/uploads", express.static("src/uploads"));
+
 // mount all routes under /api
 app.use("/api", routes);
+
 
 module.exports = app;

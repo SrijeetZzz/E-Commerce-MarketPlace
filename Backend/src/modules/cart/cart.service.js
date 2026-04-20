@@ -38,7 +38,19 @@ const addToCart = async (userId, { listingId, quantity }) => {
 };
 
 const getCart = async (userId) => {
-  return await Cart.findOne({ userId }).populate("items.listingId");
+  return await Cart.findOne({ userId }).populate({
+    path: "items.listingId",
+    populate: [
+      {
+        path: "productId",
+        select: "title images",
+      },
+      {
+        path: "sellerId",
+        select: "name", 
+      }
+    ],
+  });
 };
 
 const updateCartItem = async (userId, listingId, quantity) => {

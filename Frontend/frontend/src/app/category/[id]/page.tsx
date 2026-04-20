@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useParams, useSearchParams, useRouter } from "next/navigation";
@@ -12,7 +11,7 @@ import api from "@/services/api";
 import { fetchProducts } from "@/services/product";
 import { ProductListItem } from "@/types/product";
 
-const LIMIT = 10;
+const LIMIT = 12;
 
 const CategoryPage = () => {
   const params = useParams();
@@ -24,6 +23,7 @@ const CategoryPage = () => {
   const subCategoryId = searchParams.get("subCategory") || "all";
   const minPrice = searchParams.get("minPrice") || "";
   const maxPrice = searchParams.get("maxPrice") || "";
+  const sortBy = searchParams.get("sortBy") || "price_asc";
 
   const [subcategories, setSubcategories] = useState<any[]>([]);
   const [products, setProducts] = useState<ProductListItem[]>([]);
@@ -39,7 +39,7 @@ const CategoryPage = () => {
     const fetchSub = async () => {
       try {
         const res = await api.get(
-          `/categories/subcategories?categoryId=${categoryId}`
+          `/categories/subcategories?categoryId=${categoryId}`,
         );
 
         const payload = res?.data ?? res;
@@ -73,9 +73,10 @@ const CategoryPage = () => {
 
         if (minPrice) params.set("minPrice", minPrice);
         if (maxPrice) params.set("maxPrice", maxPrice);
+        if (sortBy) params.set("sortBy", sortBy);
 
         const res = await fetchProducts(
-          `/products/search?${params.toString()}`
+          `/products/search?${params.toString()}`,
         );
 
         const list = res.data;
@@ -84,19 +85,16 @@ const CategoryPage = () => {
         setProducts(list);
         setTotalPages(pagination?.totalPages || 1);
 
-        if (list.length) {
-          const min = Math.min(...list.map((p) => p.minPrice));
-          const max = Math.max(...list.map((p) => p.maxPrice));
-          setPriceBounds([min, max]);
+        if (res.priceRange) {
+          setPriceBounds([res.priceRange.min, res.priceRange.max]);
         }
-
       } catch (err) {
         console.error("Product fetch failed", err);
       }
     };
 
     loadProducts();
-  }, [categoryId, subCategoryId, minPrice, maxPrice, page]);
+  }, [categoryId, subCategoryId, minPrice, maxPrice, page, sortBy]);
 
   const handleSubChange = (subId: string) => {
     const query = new URLSearchParams(searchParams.toString());
@@ -115,15 +113,15 @@ const CategoryPage = () => {
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
-
         {/* LEFT FILTER */}
         <div className="hidden lg:block w-64 xl:w-72 shrink-0">
-          <FilterSidebar priceBounds={priceBounds} />
+          <div className="sticky top-6">
+            <FilterSidebar priceBounds={priceBounds} />
+          </div>
         </div>
 
         {/* RIGHT */}
         <div className="flex-1 flex flex-col">
-
           {/* MOBILE FILTER BUTTON */}
           <div className="lg:hidden mb-4">
             <button
@@ -136,9 +134,7 @@ const CategoryPage = () => {
 
           {/* TOP */}
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold mb-4">
-              Category
-            </h1>
+            <h1 className="text-2xl font-semibold mb-4">Category</h1>
 
             <SubCategoryTabs
               subcategories={subcategories}
@@ -151,12 +147,7 @@ const CategoryPage = () => {
           <ProductGrid products={products} />
 
           {/* PAGINATION */}
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            setPage={setPage}
-          />
-
+          <Pagination page={page} totalPages={totalPages} setPage={setPage} />
         </div>
       </div>
 

@@ -172,6 +172,20 @@ const createBulkProducts = async (adminId, productsData) => {
 
   return results;
 };
+const addProductImages = async (productId, imageUrls) => {
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  // append images (not overwrite)
+  product.images = [...(product.images || []), ...imageUrls];
+
+  await product.save();
+
+  return product;
+};
 
 module.exports = {
   createProduct,
@@ -179,4 +193,5 @@ module.exports = {
   searchProducts,
   getProductById,
   createBulkProducts,
+  addProductImages,
 };
