@@ -1,4 +1,3 @@
-// services/cart.ts
 import api from "./api";
 import { Cart } from "@/types/cart";
 
@@ -12,31 +11,17 @@ const normalizeCart = (raw: any): Cart => {
       _id: item._id,
       quantity: item.quantity,
       priceAtAdd: item.priceAtAdd,
-      listing: item.listingId,
+      listing: item.listingId, // Mapping Backend listingId to Frontend listing
     })),
   };
 };
 
 export const getCart = async (): Promise<Cart> => {
   const res = await api.get("/cart");
-
-  // 🔍 LOG ONCE to see real shape
-  console.log("GET /cart response:", res);
-
-  // Your interceptor returns FULL AxiosResponse,
-  // but your backend wraps data as { data: cart }
-  // So handle both safely:
   const payload = res?.data?.data ?? res?.data;
 
   if (!payload) {
-    // no cart yet → return empty cart instead of crashing
-    return {
-      _id: "",
-      userId: "",
-      createdAt: "",
-      updatedAt: "",
-      items: [],
-    };
+    return { _id: "", userId: "", createdAt: "", updatedAt: "", items: [] };
   }
 
   return normalizeCart(payload);

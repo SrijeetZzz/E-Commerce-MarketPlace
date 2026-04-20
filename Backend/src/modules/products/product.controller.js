@@ -6,7 +6,14 @@ const create = async (req, res) => {
   try {
     const adminId = req.user.id;
 
-    const product = await productService.createProduct(adminId, req.body);
+    const imageUrls = req.files
+      ? req.files.map((file) => `/uploads/${file.filename}`)
+      : [];
+
+    const product = await productService.createProduct(adminId, {
+      ...req.body,
+      images: imageUrls,
+    });
 
     res.status(201).json({
       message: "Product created",
@@ -115,11 +122,43 @@ const createBulk = async (req, res) => {
   }
 };
 
+const updateImages = async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No images uploaded",
+      });
+    }
+
+    const imageUrls = req.files.map(
+      (file) => `/uploads/${file.filename}`
+    );
+
+    const updatedProduct = await productService.addProductImages(
+      id,
+      imageUrls
+    );
+
+    res.json({
+      success: true,
+      message: "Images updated",
+      data: updatedProduct,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 module.exports = {
   create,
   getAll,
   searchProducts,
   getById,
   createBulk,
+  updateImages
 };

@@ -9,12 +9,12 @@ exports.getGroupedProducts = async ({
   subCategoryId,
   sortBy = "price_asc",
   page = 1,
-  limit = 30,
+  limit = 12,
 }) => {
   const isValidObjectId = (id) =>
     mongoose.Types.ObjectId.isValid(id);
 
-  // 🚨 STRICT INPUT SANITIZATION
+  // ✅ VALIDATE IDS
   const validCategoryId =
     categoryId && isValidObjectId(categoryId)
       ? new mongoose.Types.ObjectId(categoryId)
@@ -25,7 +25,6 @@ exports.getGroupedProducts = async ({
       ? new mongoose.Types.ObjectId(subCategoryId)
       : null;
 
-  // 🚨 FORCE CONSISTENCY (NO MISMATCH ALLOWED)
   if (subCategoryId && !validSubCategoryId) {
     throw new Error("Invalid subCategoryId");
   }
@@ -34,7 +33,7 @@ exports.getGroupedProducts = async ({
     throw new Error("Invalid categoryId");
   }
 
-  // 🔥 BASE MATCH
+  // ✅ LISTING FILTER
   const matchStage = {
     status: "ACTIVE",
   };
@@ -45,7 +44,7 @@ exports.getGroupedProducts = async ({
     if (maxPrice) matchStage.price.$lte = Number(maxPrice);
   }
 
-  // 🔥 PRODUCT FILTER (NO SILENT FAIL)
+  // ✅ PRODUCT FILTER
   const productMatch = {};
 
   if (q) {
@@ -63,7 +62,7 @@ exports.getGroupedProducts = async ({
     productMatch["product.subCategoryId"] = validSubCategoryId;
   }
 
-  // 🚀 SORT
+  // ✅ SORT
   let sortStage = { minPrice: 1 };
 
   if (sortBy === "price_desc") sortStage = { minPrice: -1 };
@@ -72,11 +71,10 @@ exports.getGroupedProducts = async ({
 
   const skip = (Number(page) - 1) * Number(limit);
 
+  // 🚀 MAIN PIPELINE (PAGINATED PRODUCTS)
   const pipeline = [
-    // 1️⃣ LISTING FILTER
     { $match: matchStage },
 
-    // 2️⃣ JOIN PRODUCT
     {
       $lookup: {
         from: "products",
@@ -87,7 +85,6 @@ exports.getGroupedProducts = async ({
     },
     { $unwind: "$product" },
 
-    // 🚨 STRICT MATCH (ALWAYS APPLIED)
     {
       $match:
         Object.keys(productMatch).length > 0
@@ -95,7 +92,6 @@ exports.getGroupedProducts = async ({
           : {},
     },
 
-    // 3️⃣ CATEGORY (DISPLAY ONLY)
     {
       $lookup: {
         from: "categories",
@@ -106,7 +102,6 @@ exports.getGroupedProducts = async ({
     },
     { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
 
-    // 4️⃣ SUBCATEGORY (DISPLAY ONLY)
     {
       $lookup: {
         from: "subcategories",
@@ -117,7 +112,6 @@ exports.getGroupedProducts = async ({
     },
     { $unwind: { path: "$subCategory", preserveNullAndEmptyArrays: true } },
 
-    // 5️⃣ GROUP
     {
       $group: {
         _id: "$product._id",
@@ -146,17 +140,14 @@ exports.getGroupedProducts = async ({
       },
     },
 
-    // 6️⃣ SORT
     { $sort: sortStage },
-
-    // 7️⃣ PAGINATION
     { $skip: skip },
     { $limit: Number(limit) },
   ];
 
   const results = await Listing.aggregate(pipeline);
 
-  // 🔢 TOTAL COUNT
+  // 🔢 TOTAL COUNT (for pagination)
   const totalPipeline = [
     { $match: matchStage },
     {
@@ -189,6 +180,42 @@ exports.getGroupedProducts = async ({
   const totalResult = await Listing.aggregate(totalPipeline);
   const total = totalResult[0]?.total || 0;
 
+  // 🔥 GLOBAL PRICE RANGE (ALL MATCHING LISTINGS — NOT PAGINATED)
+  const priceRangePipeline = [
+    { $match: matchStage },
+
+    {
+      $lookup: {
+        from: "products",
+        localField: "productId",
+        foreignField: "_id",
+        as: "product",
+      },
+    },
+    { $unwind: "$product" },
+
+    {
+      $match:
+        Object.keys(productMatch).length > 0
+          ? productMatch
+          : {},
+    },
+
+    {
+      $group: {
+        _id: null,
+        minPrice: { $min: "$price" },
+        maxPrice: { $max: "$price" },
+      },
+    },
+  ];
+
+  const priceRangeResult = await Listing.aggregate(priceRangePipeline);
+
+  const globalMinPrice = priceRangeResult[0]?.minPrice || 0;
+  const globalMaxPrice = priceRangeResult[0]?.maxPrice || 0;
+
+  // ✅ FINAL RESPONSE
   return {
     data: results,
     pagination: {
@@ -196,6 +223,10 @@ exports.getGroupedProducts = async ({
       page: Number(page),
       limit: Number(limit),
       totalPages: Math.ceil(total / limit),
+    },
+    priceRange: {
+      min: globalMinPrice,
+      max: globalMaxPrice,
     },
   };
 };
