@@ -175,15 +175,28 @@ export default function Navbar() {
         )}
       </nav>
       <Dialog open={authOpen} onOpenChange={setAuthOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Login</DialogTitle>
-            <DialogDescription>
-              Enter your credentials to access your account
-            </DialogDescription>
-          </DialogHeader>
+        {/* Changed max-w-md to sm:max-w-[500px] and added padding */}
+        <DialogContent className="sm:max-w-125 p-0 overflow-hidden border-none shadow-2xl">
+          <div className="bg-white p-8">
+            <DialogHeader className="space-y-3 mb-6">
+              <DialogTitle className="text-2xl font-bold text-center tracking-tight">
+                Welcome Back
+              </DialogTitle>
+              <DialogDescription className="text-center text-gray-500 text-base">
+                Enter your credentials to access your account and manage your
+                orders.
+              </DialogDescription>
+            </DialogHeader>
 
-          <LoginForm onSuccess={() => setAuthOpen(false)} />
+            <div className="py-2">
+              <LoginForm onSuccess={() => setAuthOpen(false)} />
+            </div>
+
+            {/* Optional: Add a footer or divider if your LoginForm doesn't have a "Sign Up" link */}
+            <div className="mt-6 text-center text-sm text-gray-400">
+              By continuing, you agree to our Terms of Service.
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 

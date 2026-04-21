@@ -19,6 +19,14 @@ const orderSchema = new mongoose.Schema({
     enum: ["PLACED", "CONFIRMED", "CANCELLED"],
     default: "PLACED",
   },
+  address: {
+    fullName: String,
+    phone: String,
+    street: String,
+    city: String,
+    state: String,
+    pincode: String,
+  },
 
   items: [
     {

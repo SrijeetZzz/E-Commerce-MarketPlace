@@ -10,6 +10,7 @@ const listingRoutes = require("../modules/listings/listing.routes");
 const cartRoutes = require("../modules/cart/cart.routes");
 const orderRoutes = require("../modules/orders/order.routes");
 const categoryRoutes = require("../modules/categories/category.routes");
+const addressRoutes = require("../modules/address/address.routes");
 
 
 router.use("/auth", authRoutes);
@@ -22,6 +23,7 @@ router.use("/seller", listingRoutes);
 router.use("/cart", cartRoutes);
 router.use("/", orderRoutes);
 router.use("/categories", categoryRoutes);
+router.use("/user/address", addressRoutes);
 
 
 module.exports = router;

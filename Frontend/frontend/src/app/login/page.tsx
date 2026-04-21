@@ -1,32 +1,3 @@
-// import LoginForm from "@/components/auth/LoginForm";
-// import {
-//   Card,
-//   CardContent,
-//   CardHeader,
-//   CardTitle,
-//   CardDescription,
-// } from "@/components/ui/card";
-
-// const LoginPage = () => {
-//   return (
-//     <div className="flex min-h-screen items-center justify-center bg-muted/40">
-//       <Card className="w-full max-w-md shadow-lg">
-//         <CardHeader>
-//           <CardTitle className="text-2xl">Welcome back</CardTitle>
-//           <CardDescription>
-//             Enter your credentials to login
-//           </CardDescription>
-//         </CardHeader>
-
-//         <CardContent>
-//           <LoginForm />
-//         </CardContent>
-//       </Card>
-//     </div>
-//   );
-// };
-
-// export default LoginPage;
 "use client";
 
 import LoginForm from "@/components/auth/LoginForm";
@@ -37,48 +8,37 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Sparkles } from "lucide-react";
 
 const LoginPage = () => {
   return (
-    /* FIX: We use items-start md:items-center and a large py-20 
-       to ensure that on small screens the card doesn't get cut off 
-       and only ONE scrollbar appears.
-    */
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-start md:justify-center bg-[#fcfcfd] px-4 py-12 md:py-20">
-      
-      {/* DECORATIVE BACKGROUND */}
-      <div className="fixed inset-0 -z-10 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-5%] w-125 h-125 bg-slate-100 rounded-full blur-[120px] opacity-60" />
-        <div className="absolute bottom-[-5%] right-[-5%] w-100 h-100 bg-slate-200 rounded-full blur-[100px] opacity-40" />
+    /* PROFESSIONAL BACKGROUND: A subtle gradient blend for a premium feel */
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-slate-50 px-4 py-12">
+      {/* MESH GRADIENT OVERLAY */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-125 h-125 bg-indigo-50/50 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-125 h-125 bg-slate-200/40 rounded-full blur-[120px]" />
       </div>
 
-      {/* MAIN CARD */}
-      <Card className="w-full max-w-120 border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.08)] rounded-[40px] p-2 md:p-6 bg-white/80 backdrop-blur-xl z-10">
-        <CardHeader className="space-y-4 text-center pt-8 pb-2">
-          <div className="mx-auto w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-xl shadow-slate-200 mb-2">
-            <Sparkles className="text-white" size={24} />
-          </div>
-
-          <div className="space-y-2">
-            <CardTitle className="text-3xl md:text-4xl font-black tracking-tight text-slate-900">
-              Welcome back
-            </CardTitle>
-            <CardDescription className="text-slate-500 font-medium text-base">
-              Enter your credentials to access your account
-            </CardDescription>
-          </div>
+      {/* MAIN CARD: Width increased to 550px, vertical padding reduced */}
+      <Card className="relative w-full max-w-137.5 border border-slate-200/60 shadow-[0_20px_50px_rgba(0,0,0,0.05)] rounded-[32px] bg-white/90 backdrop-blur-md z-10">
+        <CardHeader className="space-y-2 text-center pt-10 pb-4">
+          <CardTitle className="text-3xl font-bold tracking-tight text-slate-900">
+            Welcome back
+          </CardTitle>
+          <CardDescription className="text-slate-500 text-base">
+            Login to your account to continue shopping
+          </CardDescription>
         </CardHeader>
 
-        <CardContent className="pt-6 pb-8">
-          <LoginForm onSuccess={() => window.location.href = "/"} />
+        <CardContent className="pt-2 pb-10 px-8 md:px-12">
+          <LoginForm onSuccess={() => (window.location.href = "/")} />
           
-          <div className="mt-10 text-center">
-            <p className="text-sm text-slate-400 font-medium">
+          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p className="text-sm text-slate-500">
               Don&apos;t have an account yet?{" "}
               <a 
                 href="/register" 
-                className="text-slate-900 font-bold hover:underline underline-offset-4 decoration-2 transition-all"
+                className="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors"
               >
                 Create an account
               </a>
@@ -87,10 +47,13 @@ const LoginPage = () => {
         </CardContent>
       </Card>
 
-      {/* FOOTER */}
-      <footer className="mt-auto pt-12 flex gap-6 text-[10px] font-bold text-slate-300 uppercase tracking-widest opacity-70">
-        <a href="#" className="hover:text-slate-500 transition-colors">Privacy Policy</a>
-        <a href="#" className="hover:text-slate-500 transition-colors">Terms of Service</a>
+      {/* MINIMAL FOOTER */}
+      <footer className="mt-8 flex gap-6 text-[11px] font-medium text-slate-400 uppercase tracking-wider z-10">
+        <a href="#" className="hover:text-slate-600 transition-colors">Privacy</a>
+        <span className="text-slate-200">•</span>
+        <a href="#" className="hover:text-slate-600 transition-colors">Terms</a>
+        <span className="text-slate-200">•</span>
+        <a href="#" className="hover:text-slate-600 transition-colors">Help</a>
       </footer>
     </div>
   );

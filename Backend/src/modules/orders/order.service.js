@@ -3,7 +3,7 @@ const Listing = require("../listings/listing.model");
 const Order = require("./order.model");
 const inventoryService = require("../inventory/inventory.service");
 
-const checkout = async (userId) => {
+const checkout = async (userId,address) => {
   const cart = await Cart.findOne({ userId });
 
   if (!cart || cart.items.length === 0) {
@@ -53,6 +53,7 @@ const checkout = async (userId) => {
       buyerId: userId,
       totalAmount,
       items: orderItems,
+      address
     });
 
     // 🔥 CLEAR CART
