@@ -1,4 +1,3 @@
-// src/modules/orders/order.routes.js
 
 const express = require("express");
 const router = express.Router();

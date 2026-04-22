@@ -117,7 +117,13 @@ const processPayment = async (orderId, isSuccess) => {
 };// 🔥 GET ALL ORDERS (for logged-in user)
 const getMyOrders = async (userId) => {
   return await Order.find({ buyerId: userId })
-    .populate("items.listingId")
+    .populate({
+      path: "items.listingId",
+      populate: {
+        path: "productId",
+        select: "title images",
+      },
+    })
     .sort({ createdAt: -1 });
 };
 
@@ -126,7 +132,13 @@ const getOrderById = async (userId, orderId) => {
   const order = await Order.findOne({
     _id: orderId,
     buyerId: userId,
-  }).populate("items.listingId");
+  }).populate({
+    path: "items.listingId",
+    populate: {
+      path: "productId",
+      select: "title images",
+    },
+  });
 
   if (!order) {
     throw new Error("Order not found");
