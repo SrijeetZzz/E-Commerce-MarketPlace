@@ -5,6 +5,11 @@ import api from "@/services/api";
 
 import HeroSection from "@/components/home/HeroSection";
 import CategoryGrid from "@/components/home/CategoryGrid";
+import Footer from "@/components/home/Footer";
+import BlogPage from "@/components/home/Blog";
+import AboutPage from "@/components/home/AboutUs";
+import { Contact } from "lucide-react";
+import ContactPage from "@/components/home/ContactUs";
 
 const HomePage = () => {
   const [categories, setCategories] = useState<any[]>([]);
@@ -34,7 +39,7 @@ const HomePage = () => {
       <HeroSection />
 
       {/* CONTENT */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0 py-10">
 
         <h2 className="text-2xl font-semibold mb-6">
           Shop by Category
@@ -47,7 +52,12 @@ const HomePage = () => {
         )}
 
       </section>
+      <BlogPage/>
+      <AboutPage/>
+      <ContactPage/>
+
     </main>
+    
   );
 };
 
