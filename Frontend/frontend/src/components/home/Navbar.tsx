@@ -51,129 +51,126 @@ export default function Navbar() {
 
   return (
     <>
-      {/* ================= NAVBAR ================= */}
-      <nav className="w-full bg-black text-white">
-        <div className="max-w-7xl mx-auto px-4 py-4 relative">
-          <div className="flex items-center justify-between">
-            {/* LOGO */}
-            <div
-              onClick={() => router.push("/")}
-              className="font-bold text-xl cursor-pointer"
-            >
-              WEARIX
-            </div>
+        <nav className="w-full bg-black text-white sticky top-0 z-50 shadow-md">
+            <div className="max-w-7xl mx-auto px-4 py-3">
+              <div className="flex items-center justify-between">
 
-            {/* DESKTOP NAV */}
-            <div className="absolute left-1/2 -translate-x-1/2 hidden md:flex gap-8 text-sm">
-              <button onClick={() => router.push("/")}>Home</button>
-              <button onClick={() => router.push("/shop")}>Shop</button>
-              <button onClick={() => router.push("/about")}>About</button>
-              <button onClick={() => router.push("/blog")}>Blog</button>
-              <button onClick={() => router.push("/contact")}>Contact</button>
-            </div>
-
-            {/* RIGHT SIDE */}
-            <div className="flex items-center gap-3">
-              {/* BECOME SELLER */}
-              <button
-                onClick={() => router.push("/seller")}
-                className="hidden md:block bg-purple-600 px-4 py-2 rounded-full text-sm hover:bg-purple-700"
-              >
-                Become Seller
-              </button>
-
-              {/* SEARCH BUTTON */}
-              <button onClick={() => setSearchOpen(true)}>
-                <Search size={20} />
-              </button>
-
-              {/* CART */}
-              <div
-                onClick={() => router.push("/cart")}
-                className="relative cursor-pointer p-2"
-              >
-                <ShoppingCart size={20} />
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                  {cartCount}
-                </span>
-              </div>
-
-              {/* AUTH */}
-              {isLoggedIn ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="flex items-center gap-2"
-                  >
-                    <img
-                      src="/avatar.png"
-                      alt="user"
-                      className="w-8 h-8 rounded-full"
-                    />
-                    <ChevronDown size={16} />
-                  </button>
-
-                  {dropdownOpen && (
-                    <div className="absolute right-0 mt-3 w-40 bg-white text-black rounded-lg shadow-lg">
-                      <button className="block w-full px-4 py-2 text-left hover:bg-gray-100">
-                        Profile
-                      </button>
-                      <button className="block w-full px-4 py-2 text-left hover:bg-gray-100">
-                        Settings
-                      </button>
-                      <button className="block w-full px-4 py-2 text-left text-red-500 hover:bg-gray-100">
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <button
-                  onClick={() => setAuthOpen(true)}
-                  className="bg-white text-black px-4 py-2 rounded-full text-sm"
-                >
-                  Sign In
-                </button>
-              )}
-
-              {/* MOBILE MENU */}
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="md:hidden p-2"
-              >
-                {menuOpen ? <X size={22} /> : <Menu size={22} />}
-              </button>
-            </div>
+          {/* LOGO */}
+          <div
+            onClick={() => router.push("/")}
+            className="font-bold text-lg md:text-xl cursor-pointer"
+          >
+            WEARIX
           </div>
-        </div>
 
-        {/* MOBILE MENU */}
-        {menuOpen && (
-          <div className="md:hidden bg-black border-t border-white/10 px-4 py-4 space-y-4">
-            <button onClick={() => router.push("/")}>Home</button>
-            <button onClick={() => router.push("/shop")}>Shop</button>
-            <button onClick={() => router.push("/about")}>About</button>
-            <button onClick={() => router.push("/blog")}>Blog</button>
-            <button onClick={() => router.push("/contact")}>Contact</button>
+          {/* DESKTOP NAV */}
+          <div className="hidden md:flex items-center gap-6 text-sm">
+            <button className="cursor-pointer" onClick={() => router.push("/")}>Home</button>
+            <button className="cursor-pointer" onClick={() => router.push("/shop")}>Shop</button>
+            <button className="cursor-pointer" onClick={() => router.push("/about")}>About</button>
+            <button className="cursor-pointer" onClick={() => router.push("/blog")}>Blog</button>
+            <button className="cursor-pointer" onClick={() => router.push("/contact")}>Contact</button>
+          </div>
 
+          {/* RIGHT SIDE */}
+          <div className="flex items-center gap-2 md:gap-3">
+
+            {/* SELLER */}
             <button
               onClick={() => router.push("/seller")}
-              className="block w-full text-left text-purple-400"
+              className="hidden lg:block bg-purple-600 px-3 py-1.5 rounded-full text-sm hover:bg-purple-700 cursor-pointer"
             >
               Become Seller
             </button>
 
-            {!isLoggedIn && (
+            {/* SEARCH */}
+            <button onClick={() => setSearchOpen(true)} className="p-2 cursor-pointer">
+              <Search size={20} />
+            </button>
+
+            {/* CART */}
+            <div
+              onClick={() => router.push("/cart")}
+              className="relative cursor-pointer p-2"
+            >
+              <ShoppingCart size={20} />
+              <span className="absolute -top-1 -right-1 bg-purple-600 text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+                {cartCount}
+              </span>
+            </div>
+
+            {/* AUTH */}
+            {isLoggedIn ? (
+              <div className="relative hidden md:block">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-2"
+                >
+                  <img src="/avatar.png" className="w-8 h-8 rounded-full" />
+                  <ChevronDown size={16} />
+                </button>
+
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-3 w-40 bg-white text-black rounded-lg shadow-lg">
+                    <button className="block w-full px-4 py-2 hover:bg-gray-100">Profile</button>
+                    <button className="block w-full px-4 py-2 hover:bg-gray-100">Settings</button>
+                    <button className="block w-full px-4 py-2 text-red-500 hover:bg-gray-100">Logout</button>
+                  </div>
+                )}
+              </div>
+            ) : (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="block w-full text-left"
+                className="hidden md:block bg-white text-black px-3 py-1.5 rounded-full text-sm cursor-pointer"
               >
                 Sign In
               </button>
             )}
+
+            {/* MOBILE MENU BUTTON */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden p-2"
+            >
+              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
           </div>
-        )}
-      </nav>
+        </div>
+      </div>
+
+      {/* MOBILE MENU */}
+      {menuOpen && (
+        <div className="md:hidden bg-black border-t border-white/10 px-4 py-6 flex flex-col items-center gap-5 text-base">
+
+          {/* LINKS */}
+          <button className="cursor-pointer" onClick={() => {router.push("/"); setMenuOpen(false);}}>Home</button>
+          <button className="cursor-pointer" onClick={() => {router.push("/shop"); setMenuOpen(false);}}>Shop</button>
+          <button className="cursor-pointer" onClick={() => {router.push("/about"); setMenuOpen(false);}}>About</button>
+          <button className="cursor-pointer" onClick={() => {router.push("/blog"); setMenuOpen(false);}}>Blog</button>
+          <button className="cursor-pointer" onClick={() => {router.push("/contact"); setMenuOpen(false);}}>Contact</button>
+
+          {/* DIVIDER */}
+          <div className="w-full border-t border-white/10 my-2"></div>
+
+          {/* ACTIONS */}
+          <button
+             onClick={() => {router.push("/seller"); setMenuOpen(false);}}
+            className="text-purple-400 font-medium cursor-pointer"
+          >
+            Become Seller
+          </button>
+
+          {!isLoggedIn && (
+            <button
+              onClick={() => setAuthOpen(true)}
+              className="bg-white text-black px-4 py-2 rounded-full text-sm cursor-pointer"
+            >
+              Sign In
+            </button>
+          )}
+        </div>
+      )}
+    </nav>
       <Dialog open={authOpen} onOpenChange={setAuthOpen}>
         {/* Changed max-w-md to sm:max-w-[500px] and added padding */}
         <DialogContent className="sm:max-w-125 p-0 overflow-hidden border-none shadow-2xl">
