@@ -22,7 +22,7 @@ const AboutPage = () => {
             </p>
           </div>
           <div className="flex-1 relative">
-             <div className="w-full aspect-[4/5] bg-slate-100 rounded-[40px] overflow-hidden rotate-2 shadow-2xl shadow-slate-200">
+             <div className="w-full aspect-4/5 bg-slate-100 rounded-[40px] overflow-hidden rotate-2 shadow-2xl shadow-slate-200">
                 <img src="/placeholder-hero.jpg" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" alt="Brand vibe" />
              </div>
           </div>

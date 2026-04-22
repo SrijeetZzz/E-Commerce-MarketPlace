@@ -52,7 +52,7 @@ const ContactPage = () => {
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Message</label>
               <textarea 
-                className="w-full min-h-[150px] rounded-[24px] border-none bg-white shadow-sm p-4 text-sm font-medium outline-none focus:ring-2 focus:ring-purple-500/20"
+                className="w-full min-h-37.5 rounded-[24px] border-none bg-white shadow-sm p-4 text-sm font-medium outline-none focus:ring-2 focus:ring-purple-500/20"
                 placeholder="What's on your mind?"
               />
             </div>

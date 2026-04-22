@@ -19,7 +19,7 @@ const BlogPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {posts.map((post, i) => (
           <div key={i} className="group cursor-pointer">
-            <div className="aspect-[16/10] bg-slate-100 rounded-[32px] overflow-hidden mb-6">
+            <div className="aspect-16/10 bg-slate-100 rounded-[32px] overflow-hidden mb-6">
               <img src={post.img} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={post.title} />
             </div>
             <div className="space-y-3">
