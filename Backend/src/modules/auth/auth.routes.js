@@ -15,12 +15,7 @@ router.post("/register", authController.register);
 router.post("/login", authController.login);
 
 // protected route
-router.get("/me", authMiddleware, (req, res) => {
-  res.status(200).json({
-    message: "User fetched successfully",
-    user: req.user,
-  });
-});
+router.get("/me", authMiddleware, authController.me);
 
 // only admin
 router.get(
@@ -41,5 +36,9 @@ router.get(
     res.json({ message: "Seller access granted" });
   }
 );
+
+router.post("/refresh", authController.refresh);
+router.post("/logout", authController.logout);
+
 
 module.exports = router;

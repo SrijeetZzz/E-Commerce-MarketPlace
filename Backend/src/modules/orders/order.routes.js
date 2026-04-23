@@ -8,8 +8,8 @@ const authMiddleware = require("../../shared/middlewares/auth.middleware");
 router.use(authMiddleware);
 
 router.post("/checkout", orderController.checkout);
-router.post("/orders/:id/payment", orderController.processPayment);
-router.get("/orders", orderController.getMyOrders);
-router.get("/orders/:id", orderController.getOrderById);
+router.post("/:id/payment", orderController.processPayment);
+router.get("/", orderController.getMyOrders);
+router.get("/:id", orderController.getOrderById);
 
 module.exports = router;

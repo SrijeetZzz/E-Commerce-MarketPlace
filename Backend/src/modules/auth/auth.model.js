@@ -62,6 +62,11 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     addresses: [addressSchema],
+
+    refreshToken: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true },
 );

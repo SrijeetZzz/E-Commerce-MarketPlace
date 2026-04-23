@@ -21,7 +21,7 @@ router.use("/admin/products", productRoutes);
 router.use("/products", productRoutes);
 router.use("/seller", listingRoutes);
 router.use("/cart", cartRoutes);
-router.use("/", orderRoutes);
+router.use("/orders", orderRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/user/address", addressRoutes);
 

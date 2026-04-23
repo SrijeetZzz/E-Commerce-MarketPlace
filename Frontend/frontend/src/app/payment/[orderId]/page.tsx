@@ -6,6 +6,7 @@ import api from "@/services/api";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, Lock, CreditCard, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 const PaymentPage = () => {
   const { orderId } = useParams();
@@ -31,6 +32,7 @@ const PaymentPage = () => {
   };
 
   return (
+    <ProtectedRoute>
     <main className="relative flex flex-col items-center justify-center min-h-screen bg-[#fcfcfd] px-4 overflow-hidden">
       
       {/* Decorative Background */}
@@ -116,6 +118,7 @@ const PaymentPage = () => {
         </button>
       </footer>
     </main>
+    </ProtectedRoute>
   );
 };
 

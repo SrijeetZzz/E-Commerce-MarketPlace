@@ -8,8 +8,9 @@ import { useRouter } from "next/navigation";
 import { Package, ChevronRight, ShoppingBag, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Order } from "@/types/order";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
-const OrdersPage = () => {
+const OrderContent = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -191,4 +192,12 @@ const OrdersPage = () => {
   );
 };
 
-export default OrdersPage;
+const OrderPage = () => {
+  return (
+    <ProtectedRoute>
+      <OrderContent />
+    </ProtectedRoute>
+  );
+};
+
+export default OrderPage;

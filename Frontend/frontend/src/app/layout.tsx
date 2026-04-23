@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "@/components/home/Navbar";
 import Footer from "@/components/home/Footer";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import { AuthProvider } from "@/components/context/AuthContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,12 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className={`${poppins.className} min-h-full flex flex-col`}>
-        <Navbar />
-
-        {/* 🔥 CLIENT LOGIC MOVED HERE */}
-        <LayoutWrapper>{children}</LayoutWrapper>
-
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <LayoutWrapper>{children}</LayoutWrapper>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

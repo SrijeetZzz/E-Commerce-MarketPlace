@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, ShoppingBag, Plus, Check, Loader2, Star } from "lucide-react";
 import { Address, AddressForm } from "@/types/order";
 import { getCart } from "@/services/cart";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 
 
@@ -72,7 +73,7 @@ const CheckoutPage=()=> {
         }
       };
     fetchCart();
-  }, [router]);
+  }, []);
 
   const subtotal = cart?.items.reduce((sum, item) => sum + item.priceAtAdd * item.quantity, 0) || 0;
   const shipping = subtotal > 1000 ? 0 : 100;
@@ -111,7 +112,7 @@ const CheckoutPage=()=> {
     }
     try {
       setPlacing(true);
-      const res = await api.post("/checkout", { address: addressForm });
+      const res = await api.post("/orders/checkout", { address: addressForm });
       router.push(`/payment/${res.data.data._id}`);
     } catch {
       alert("Checkout failed");
@@ -127,6 +128,7 @@ const CheckoutPage=()=> {
   );
 
   return (
+    <ProtectedRoute>
     <div className="min-h-screen bg-slate-50 pb-20">
       <div className="max-w-6xl mx-auto p-4 md:p-8">
         <header className="mb-8 text-center md:text-left">
@@ -305,6 +307,7 @@ const CheckoutPage=()=> {
         </div>
       </div>
     </div>
+    </ProtectedRoute>
   );
 }
 

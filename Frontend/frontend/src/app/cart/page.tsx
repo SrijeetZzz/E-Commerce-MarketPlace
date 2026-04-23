@@ -19,8 +19,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
-const CartPage = () => {
+const CartContent  = () => {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -270,6 +271,15 @@ const CartPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+
+const CartPage = () => {
+  return (
+    <ProtectedRoute>
+      <CartContent />
+    </ProtectedRoute>
   );
 };
 

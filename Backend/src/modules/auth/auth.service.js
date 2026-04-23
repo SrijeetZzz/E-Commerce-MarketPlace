@@ -1,20 +1,22 @@
 const User = require("./auth.model");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../../shared/utils/token");
+
+// 🔥 REGISTER
 const registerUser = async (data) => {
   const { name, email, password } = data;
 
-  // normalize email (important)
   const normalizedEmail = email.toLowerCase();
 
-  // check existing user
   const existingUser = await User.findOne({ email: normalizedEmail });
   if (existingUser) {
     throw new Error("User already exists");
   }
 
-  // hash password
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = await User.create({
@@ -23,48 +25,88 @@ const registerUser = async (data) => {
     password: hashedPassword,
   });
 
-  // 🔥 GENERATE TOKEN (THIS WAS MISSING)
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+  // 🔥 NEW TOKEN SYSTEM
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+
+  user.refreshToken = refreshToken;
+  await user.save();
 
   return {
     user,
-    token,
+    accessToken,
+    refreshToken,
   };
 };
 
+// 🔥 LOGIN
 const loginUser = async ({ email, password }) => {
   const normalizedEmail = email.toLowerCase();
 
   const user = await User.findOne({ email: normalizedEmail });
 
-  if (!user) {
-    throw new Error("User not found");
-  }
+  if (!user) throw new Error("User not found");
 
   const isMatch = await bcrypt.compare(password, user.password);
 
-  if (!isMatch) {
-    throw new Error("Invalid credentials");
-  }
+  if (!isMatch) throw new Error("Invalid credentials");
 
-  // generate token
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+
+  user.refreshToken = refreshToken;
+  await user.save();
 
   return {
-    token,
     user,
+    accessToken,
+    refreshToken,
   };
+};
+
+// 🔥 REFRESH TOKEN
+const refreshAccessToken = async (token) => {
+  const jwt = require("jsonwebtoken");
+
+  if (!token) throw new Error("No refresh token");
+
+  const decoded = jwt.verify(token, process.env.REFRESH_SECRET);
+
+  const user = await User.findById(decoded.id);
+
+  if (!user || user.refreshToken !== token) {
+    throw new Error("Invalid refresh token");
+  }
+
+  const newAccessToken = generateAccessToken(user);
+
+  return { accessToken: newAccessToken };
+};
+
+// 🔥 LOGOUT
+const logoutUser = async (token) => {
+  console.log("LOGOUT TOKEN:", token);
+
+  const user = await User.findOne({ refreshToken: token });
+
+  console.log("USER FOUND:", user?._id);
+
+  if (user) {
+    user.refreshToken = null;
+    await user.save();
+  }
+};
+
+// 🔥 GET ME
+const getMe = async (userId) => {
+  const user = await User.findById(userId).select("-password");
+  return user;
 };
 
 module.exports = {
   registerUser,
   loginUser,
+  refreshAccessToken,
+  logoutUser,
+  getMe,
 };
