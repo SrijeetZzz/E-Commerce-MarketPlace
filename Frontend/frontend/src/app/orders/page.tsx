@@ -5,10 +5,18 @@ import api from "@/services/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Package, ChevronRight, ShoppingBag, Clock, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Package,
+  ChevronRight,
+  ShoppingBag,
+  Clock,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Order } from "@/types/order";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import toast from "react-hot-toast"; // ✅ added
 
 const OrderContent = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -25,6 +33,7 @@ const OrderContent = () => {
         setOrders(data);
       } catch (err) {
         console.error("Failed to fetch orders", err);
+        toast.error("Failed to load orders"); // ✅ important
       } finally {
         setLoading(false);
       }
@@ -59,7 +68,9 @@ const OrderContent = () => {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
         <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin" />
-        <p className="text-slate-500 font-medium animate-pulse">Retrieving your orders...</p>
+        <p className="text-slate-500 font-medium animate-pulse">
+          Retrieving your orders...
+        </p>
       </div>
     );
   }
@@ -70,7 +81,9 @@ const OrderContent = () => {
         <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-6 shadow-sm">
           <ShoppingBag size={40} className="text-slate-400" />
         </div>
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight">No orders yet</h2>
+        <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+          No orders yet
+        </h2>
         <p className="text-slate-500 mt-2 max-w-xs font-medium">
           Your purchase history is empty. Time to refresh your wardrobe!
         </p>
@@ -87,8 +100,12 @@ const OrderContent = () => {
   return (
     <main className="max-w-4xl mx-auto p-4 md:p-8 md:py-12 space-y-10 animate-in fade-in duration-500">
       <header className="space-y-2">
-        <h1 className="text-4xl font-black text-slate-900 tracking-tighter">My Orders</h1>
-        <p className="text-slate-500 font-medium tracking-tight">Track and manage your recent purchases</p>
+        <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
+          My Orders
+        </h1>
+        <p className="text-slate-500 font-medium tracking-tight">
+          Track and manage your recent purchases
+        </p>
       </header>
 
       <div className="space-y-6">
@@ -108,7 +125,9 @@ const OrderContent = () => {
                       <Package size={20} className="text-slate-600" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Date Placed</p>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        Date Placed
+                      </p>
                       <p className="text-sm font-bold text-slate-900">
                         {new Date(order.createdAt).toLocaleDateString("en-IN", {
                           day: "numeric",
@@ -141,7 +160,11 @@ const OrderContent = () => {
                             key={i}
                             className="w-16 h-16 rounded-2xl border-4 border-white overflow-hidden bg-slate-50 shadow-sm shrink-0"
                           >
-                            <img src={image} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" alt="product" />
+                            <img
+                              src={image}
+                              className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500"
+                              alt="product"
+                            />
                           </div>
                         );
                       })}
@@ -166,7 +189,9 @@ const OrderContent = () => {
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total Paid</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                      Total Paid
+                    </p>
                     <p className="text-2xl font-black text-slate-900 tracking-tighter">
                       ₹{order.totalAmount.toLocaleString()}
                     </p>

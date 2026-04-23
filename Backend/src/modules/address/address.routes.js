@@ -2,7 +2,7 @@ const router = require("express").Router();
 const ctrl = require("./address.controller");
 const auth = require("../../shared/middlewares/auth.middleware");
 
-// 🔥 routes
+
 router.get("/", auth, ctrl.getAddresses);
 router.post("/", auth, ctrl.addAddress);
 router.patch("/:id", auth, ctrl.updateAddress);

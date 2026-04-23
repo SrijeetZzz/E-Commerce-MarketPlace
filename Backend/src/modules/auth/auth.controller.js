@@ -87,10 +87,56 @@ const me = async (req, res) => {
   }
 };
 
+const uploadAvatar = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const updatedUser = await authService.updateAvatar(
+      userId,
+      req.file
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Avatar updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const updatedUser = await authService.updateProfile(
+      userId,
+      req.body
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   refresh,
   logout,
   me,
+  uploadAvatar,
+  updateProfile
 };

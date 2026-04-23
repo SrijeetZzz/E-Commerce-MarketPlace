@@ -8,13 +8,10 @@ const slides = [
   { image: "/banner3.jpg", tag: "Tech", subtitle: "Modern Electronics", title: "Smart devices for your lifestyle" },
   { image: "/banner4.jpg", tag: "Home", subtitle: "Living Essentials", title: "Elevate your space with simplicity" },
   { image: "/banner5.jpg", tag: "Beauty", subtitle: "Self Care", title: "Premium care for your skin" },
-  { image: "/banner6.jpg", tag: "Fit", subtitle: "Active Life", title: "Gear for performance and comfort" },
-  { image: "/banner7.jpg", tag: "Books", subtitle: "Creative Space", title: "Fuel your ideas daily" },
   { image: "/banner8.jpg", tag: "Sneakers", subtitle: "Street Style", title: "Walk with confidence" },
   { image: "/banner9.jpg", tag: "Men", subtitle: "Modern Fashion", title: "Sharp looks, timeless fits" },
   { image: "/banner10.jpg", tag: "Women", subtitle: "Elegant Wear", title: "Grace in every detail" },
   { image: "/banner11.jpg", tag: "Women", subtitle: "Elegant Wear", title: "Grace in every detail" },
-  { image: "/banner12.jpg", tag: "Women", subtitle: "Elegant Wear", title: "Grace in every detail" },
   { image: "/banner14.jpg", tag: "Women", subtitle: "Elegant Wear", title: "Grace in every detail" },
 ];
 

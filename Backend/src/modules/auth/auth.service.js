@@ -103,10 +103,62 @@ const getMe = async (userId) => {
   return user;
 };
 
+const updateAvatar = async (userId, file) => {
+  if (!file) {
+    throw new Error("No file uploaded");
+  }
+
+  const avatarPath = `/uploads/${file.filename}`;
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { avatar: avatarPath },
+    { new: true }
+  ).select("-password");
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+};
+
+const updateProfile = async (userId, data) => {
+  const { name, email } = data;
+
+  // basic validation
+  if (!name || !email) {
+    throw new Error("Name and email are required");
+  }
+
+  // check email conflict
+  const existingUser = await User.findOne({ email });
+
+  if (existingUser && existingUser._id.toString() !== userId) {
+    throw new Error("Email already in use");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { name, email },
+    { new: true }
+  ).select("-password");
+
+  if (!updatedUser) {
+    throw new Error("User not found");
+  }
+
+  return updatedUser;
+};
+
+
+
 module.exports = {
   registerUser,
   loginUser,
   refreshAccessToken,
   logoutUser,
   getMe,
+  updateAvatar,
+  updateProfile
 };

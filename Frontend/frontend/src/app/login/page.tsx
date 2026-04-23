@@ -8,8 +8,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+   const router = useRouter();
   return (
     /* PROFESSIONAL BACKGROUND: A subtle gradient blend for a premium feel */
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-slate-50 px-4 py-12">
@@ -31,7 +33,7 @@ const LoginPage = () => {
         </CardHeader>
 
         <CardContent className="pt-2 pb-10 px-8 md:px-12">
-          <LoginForm onSuccess={() => (window.location.href = "/")} />
+          <LoginForm onSuccess={() => router.push("/")} />
           
           <div className="mt-8 pt-6 border-t border-slate-100 text-center">
             <p className="text-sm text-slate-500">

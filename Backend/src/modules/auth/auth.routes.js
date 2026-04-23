@@ -4,6 +4,7 @@ const router = express.Router();
 const authController = require("./auth.controller");
 const authMiddleware = require("../../shared/middlewares/auth.middleware");
 const authorizeRoles = require("../../shared/middlewares/role.middleware");
+const upload = require("../../shared/utils/multer");
 
 // test route
 router.get("/", (req, res) => {
@@ -39,6 +40,19 @@ router.get(
 
 router.post("/refresh", authController.refresh);
 router.post("/logout", authController.logout);
+
+router.post(
+  "/avatar",
+  authMiddleware,
+  upload.single("avatar"),
+  authController.uploadAvatar
+);
+
+router.patch(
+  "/profile",
+  authMiddleware,
+  authController.updateProfile
+);
 
 
 module.exports = router;

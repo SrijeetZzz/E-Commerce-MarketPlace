@@ -12,10 +12,9 @@ import { MapPin, ShoppingBag, Plus, Check, Loader2, Star } from "lucide-react";
 import { Address, AddressForm } from "@/types/order";
 import { getCart } from "@/services/cart";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import toast from "react-hot-toast"; // ✅ added
 
-
-
-const CheckoutPage=()=> {
+const CheckoutPage = () => {
   const [cart, setCart] = useState<Cart | null>(null);
   const [loading, setLoading] = useState(true);
   const [placing, setPlacing] = useState(false);
@@ -57,49 +56,57 @@ const CheckoutPage=()=> {
       }
     } catch (err) {
       console.error("Fetch error:", err);
+      toast.error("Failed to load addresses"); // ✅
     }
   };
 
   useEffect(() => {
     const fetchCart = async () => {
-        try {
-          const data = await getCart();
-          setCart(data);
-          await fetchData(); 
-        } catch (err) {
-          console.error("Cart fetch failed", err);
-        } finally {
-          setLoading(false);
-        }
-      };
+      try {
+        const data = await getCart();
+        setCart(data);
+        await fetchData();
+      } catch (err) {
+        console.error("Cart fetch failed", err);
+        toast.error("Failed to load checkout data"); // ✅
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchCart();
   }, []);
 
-  const subtotal = cart?.items.reduce((sum, item) => sum + item.priceAtAdd * item.quantity, 0) || 0;
+  const subtotal =
+    cart?.items.reduce((sum, item) => sum + item.priceAtAdd * item.quantity, 0) || 0;
   const shipping = subtotal > 1000 ? 0 : 100;
   const convenienceFee = 50;
   const total = subtotal + shipping + convenienceFee;
 
-  // 🔥 TOGGLE DEFAULT
+  // 🔥 SET DEFAULT
   const handleSetDefault = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation(); // Prevents selecting card for checkout
+    e.stopPropagation();
     try {
       await api.patch(`/user/address/${id}/default`);
-      await fetchData(); // Refresh list to see the badge move
+      await fetchData();
+      toast.success("Default address updated"); // ✅
     } catch (err) {
-      alert("Failed to update default address.");
+      toast.error("Failed to update default address"); // ❌ alert removed
     }
   };
 
   const handleAddAddress = async () => {
-    if (!addressForm.fullName || !addressForm.phone || !addressForm.pincode) return;
+    if (!addressForm.fullName || !addressForm.phone || !addressForm.pincode) {
+      toast.error("Please fill required fields"); // ✅ validation feedback
+      return;
+    }
+
     try {
       setSavingAddress(true);
       await api.post("/user/address", addressForm);
       await fetchData();
-      alert("Address saved successfully!");
+      toast.success("Address saved successfully"); // ✅
     } catch {
-      alert("Failed to add address");
+      toast.error("Failed to add address"); // ❌ alert removed
     } finally {
       setSavingAddress(false);
     }
@@ -107,25 +114,30 @@ const CheckoutPage=()=> {
 
   const handleCheckout = async () => {
     if (!addressForm.fullName) {
-      alert("Please select or enter a delivery address");
+      toast.error("Please select a delivery address"); // ❌ alert removed
       return;
     }
+
     try {
       setPlacing(true);
       const res = await api.post("/orders/checkout", { address: addressForm });
+
+      toast.success("Order created. Proceed to payment"); // ✅ important feedback
+
       router.push(`/payment/${res.data.data._id}`);
     } catch {
-      alert("Checkout failed");
+      toast.error("Checkout failed. Try again."); // ❌ alert removed
     } finally {
       setPlacing(false);
     }
   };
 
-  if (loading) return (
-    <div className="flex h-screen items-center justify-center bg-slate-50">
-      <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-50">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      </div>
+    );
 
   return (
     <ProtectedRoute>

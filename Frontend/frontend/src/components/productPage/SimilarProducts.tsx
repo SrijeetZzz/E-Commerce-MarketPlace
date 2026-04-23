@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { ProductListItem } from "@/types/product";
 import { fetchProducts } from "@/services/product";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast"; // ✅ added
+
 import {
   Carousel,
   CarouselContent,
@@ -29,28 +31,42 @@ const SimilarProducts = ({ product }: Props) => {
 
   useEffect(() => {
     let isMounted = true;
+
     const fetchSimilar = async () => {
       if (!product?.categoryId) {
         setLoading(false);
         return;
       }
+
       try {
         const res = await fetchProducts(
           `/products/search?categoryId=${product.categoryId}${
-            product.subCategoryId ? `&subCategoryId=${product.subCategoryId}` : ""
+            product.subCategoryId
+              ? `&subCategoryId=${product.subCategoryId}`
+              : ""
           }`
         );
+
         const list = res?.data ?? [];
-        const filtered = list.filter((p: ProductListItem) => p._id !== product._id);
+        const filtered = list.filter(
+          (p: ProductListItem) => p._id !== product._id
+        );
+
         if (isMounted) setSimilarProducts(filtered.slice(0, 10));
+
       } catch (err) {
         console.error(err);
+        toast.error("Failed to load similar products"); // ✅ only here
       } finally {
         if (isMounted) setLoading(false);
       }
     };
+
     fetchSimilar();
-    return () => { isMounted = false; };
+
+    return () => {
+      isMounted = false;
+    };
   }, [product._id, product.categoryId, product.subCategoryId]);
 
   if (loading || !similarProducts.length) return null;

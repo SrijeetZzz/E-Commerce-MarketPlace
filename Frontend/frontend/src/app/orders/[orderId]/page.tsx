@@ -9,6 +9,7 @@ import { MapPin, CreditCard, ArrowLeft, Package, Phone } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Order } from "@/types/order";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import toast from "react-hot-toast"; // ✅ added
 
 const OrderDetailsContent = () => {
   const { orderId } = useParams();
@@ -21,13 +22,21 @@ const OrderDetailsContent = () => {
     const fetchOrder = async () => {
       try {
         const res = await api.get(`/orders/${orderId}`);
-        setOrder(res?.data?.data);
+        const data = res?.data?.data;
+
+        if (!data) {
+          toast.error("Order not found"); // ✅ important
+        }
+
+        setOrder(data);
       } catch (err) {
         console.error("Failed to fetch order", err);
+        toast.error("Failed to load order details"); // ✅
       } finally {
         setLoading(false);
       }
     };
+
     fetchOrder();
   }, [orderId]);
 
@@ -47,7 +56,11 @@ const OrderDetailsContent = () => {
   }
 
   if (!order)
-    return <div className="p-8 text-center font-bold">Order not found.</div>;
+    return (
+      <div className="p-8 text-center font-bold text-slate-500">
+        Order not found.
+      </div>
+    );
 
   return (
     <main className="max-w-6xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in duration-500">

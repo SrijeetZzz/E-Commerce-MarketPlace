@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import api from "@/services/api";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, Lock, CreditCard, AlertCircle } from "lucide-react";
+import { ShieldCheck, Lock, CreditCard } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import toast from "react-hot-toast"; // ✅ added
 
 const PaymentPage = () => {
   const { orderId } = useParams();
@@ -22,15 +23,22 @@ const PaymentPage = () => {
         success,
       });
 
-      // Redirecting to orders after simulated processing
+      if (success) {
+        toast.success("Payment successful 🎉"); // ✅ important
+      } else {
+        toast.error("Payment failed. Please try again."); // ✅ simulate failure
+      }
+
       router.push(`/orders`);
     } catch (err: any) {
-      alert(err?.response?.data?.message || "Payment processing failed");
+      console.error("Payment error:", err);
+      toast.error(
+        err?.response?.data?.message || "Payment processing failed"
+      ); // ❌ alert removed
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <ProtectedRoute>
     <main className="relative flex flex-col items-center justify-center min-h-screen bg-[#fcfcfd] px-4 overflow-hidden">
