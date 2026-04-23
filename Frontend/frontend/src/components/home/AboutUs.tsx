@@ -23,14 +23,14 @@ const AboutPage = () => {
           </div>
           <div className="flex-1 relative">
              <div className="w-full aspect-4/5 bg-slate-100 rounded-[40px] overflow-hidden rotate-2 shadow-2xl shadow-slate-200">
-                <img src="/placeholder-hero.jpg" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" alt="Brand vibe" />
+                <img src="/about.png" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" alt="Brand vibe" />
              </div>
           </div>
         </div>
       </section>
 
       {/* Values Grid */}
-      <section className="bg-slate-900 py-24 text-white rounded-t-[60px]">
+      <section className="text-black rounded-[60px]">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-16">
           {[
             { icon: <Leaf />, title: "Sustainable", desc: "We partner with ethical creators." },

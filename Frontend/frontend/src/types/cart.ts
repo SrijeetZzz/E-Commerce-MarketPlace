@@ -11,7 +11,7 @@ export interface SellerDetails {
 
 export interface ListingInCart {
   _id: string;
-  productId: ProductDetails; // Now an object
+  productId: ProductDetails; 
   sellerId: SellerDetails;
   price: number;
   stock: number;

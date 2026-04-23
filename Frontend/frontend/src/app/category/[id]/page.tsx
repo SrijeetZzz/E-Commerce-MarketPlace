@@ -115,7 +115,7 @@ const CategoryPage = () => {
       <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
         {/* LEFT FILTER */}
         <div className="hidden lg:block w-64 xl:w-72 shrink-0">
-          <div className="sticky top-6">
+          <div className="sticky top-20">
             <FilterSidebar priceBounds={priceBounds} />
           </div>
         </div>

@@ -20,7 +20,7 @@ interface Props {
   };
 }
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const SimilarProducts = ({ product }: Props) => {
   const router = useRouter();

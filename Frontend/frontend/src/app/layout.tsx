@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+
 import Navbar from "@/components/home/Navbar";
-import Container from "@/components/category/Container";
 import Footer from "@/components/home/Footer";
+import LayoutWrapper from "@/components/layout/LayoutWrapper";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -17,17 +18,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className={`${poppins.className} min-h-full flex flex-col`}>
         <Navbar />
-        <main className="pt-4">
-          <Container>{children}</Container>
-          <Footer/>
-        </main>
+
+        {/* 🔥 CLIENT LOGIC MOVED HERE */}
+        <LayoutWrapper>{children}</LayoutWrapper>
+
+        <Footer />
       </body>
     </html>
   );

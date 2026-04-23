@@ -16,7 +16,7 @@ const OrderDetailsPage = () => {
   const router = useRouter();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   useEffect(() => {
     const fetchOrder = async () => {

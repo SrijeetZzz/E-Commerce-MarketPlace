@@ -12,7 +12,7 @@ interface Props {
   product: ProductListItem;
 }
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const getImageUrl = (img?: string) => {
   if (!img || img.trim() === "") return "/placeholder.png";

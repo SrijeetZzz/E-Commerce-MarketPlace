@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, ShoppingBag, Plus, Check, Loader2, Star } from "lucide-react";
 import { Address, AddressForm } from "@/types/order";
+import { getCart } from "@/services/cart";
 
 
 
@@ -60,17 +60,18 @@ const CheckoutPage=()=> {
   };
 
   useEffect(() => {
-    const load = async () => {
-      const stored = localStorage.getItem("checkout_cart");
-      if (!stored) {
-        router.push("/cart");
-        return;
-      }
-      setCart(JSON.parse(stored));
-      await fetchData();
-      setLoading(false);
-    };
-    load();
+    const fetchCart = async () => {
+        try {
+          const data = await getCart();
+          setCart(data);
+          await fetchData(); 
+        } catch (err) {
+          console.error("Cart fetch failed", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+    fetchCart();
   }, [router]);
 
   const subtotal = cart?.items.reduce((sum, item) => sum + item.priceAtAdd * item.quantity, 0) || 0;
