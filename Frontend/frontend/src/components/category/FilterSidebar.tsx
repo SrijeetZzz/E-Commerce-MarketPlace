@@ -73,7 +73,7 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
   };
 
   return (
-    <aside className="w-full lg:w-72 bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm h-fit space-y-8">
+    <aside className="w-full lg:w-64 bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm h-fit space-y-8">
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
