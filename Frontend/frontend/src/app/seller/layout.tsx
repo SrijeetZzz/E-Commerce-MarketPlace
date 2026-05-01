@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import Link from "next/link";
@@ -49,43 +51,56 @@ export default function SellerLayout({
   return (
     <ProtectedRoute allowedRoles={["SELLER"]}>
       <div className="min-h-screen bg-slate-50 flex">
-        {/* Sidebar */}
-        <aside className="w-65 border-r bg-white hidden md:flex flex-col p-6 sticky top-0 h-screen">
-          <h2 className="text-xl font-black mb-8 px-4 tracking-tight">
-            Seller Panel
-          </h2>
+        {/* Sidebar - Deep Black Background */}
+        <aside className="w-64 bg-black hidden md:flex flex-col sticky top-0 h-screen">
+          <div className="p-6">
+            <h2 className="text-xl font-black mb-8 px-2 tracking-tight text-white">
+             Seller Panel
+            </h2>
 
-          <nav className="space-y-2">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = pathname === item.href;
+            <nav className="space-y-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = pathname === item.href;
 
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`
-                  flex items-center gap-3
-                  rounded-xl px-4 py-3
-                  text-sm font-semibold transition-all
-                  ${
-                    active
-                      ? "bg-slate-900 text-white shadow-lg shadow-slate-200"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                  }
-                `}
-                >
-                  <Icon size={18} />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`
+                      flex items-center gap-3
+                      rounded-xl px-4 py-3
+                      text-sm font-bold transition-all duration-200
+                      ${
+                        active
+                          ? "bg-white text-black shadow-[0_10px_20px_rgba(255,255,255,0.1)]"
+                          : "text-slate-400 hover:bg-zinc-900 hover:text-white"
+                      }
+                    `}
+                  >
+                    <Icon size={18} strokeWidth={active ? 2.5 : 2} />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Footer Section */}
+          <div className="mt-auto p-6 border-t border-zinc-900">
+            <div className="px-2">
+              <p className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em]">
+                Verified Partner
+              </p>
+            </div>
+          </div>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto">
-          <div className="p-6 md:p-10 max-w-350">{children}</div>
+          <div className="p-6 md:p-10 max-w-7xl mx-auto">
+            {children}
+          </div>
         </main>
       </div>
     </ProtectedRoute>

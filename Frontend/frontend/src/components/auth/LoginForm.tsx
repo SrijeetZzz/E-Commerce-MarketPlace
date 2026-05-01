@@ -74,7 +74,7 @@ const LoginForm = ({ onSuccess }: Props) => {
 
     // 🔥 REDIRECT BASED ON ROLE
     if (role === "SELLER") {
-      router.push("/seller/orders");
+      router.push("/seller/profile");
     } else if (role === "ADMIN") {
       router.push("/admin");
     } else {

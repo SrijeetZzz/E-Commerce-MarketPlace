@@ -33,7 +33,7 @@ const LoginPage = () => {
         </CardHeader>
 
         <CardContent className="pt-2 pb-10 px-8 md:px-12">
-          <LoginForm onSuccess={() => router.push("/")} />
+          <LoginForm/>
           
           <div className="mt-8 pt-6 border-t border-slate-100 text-center">
             <p className="text-sm text-slate-500">

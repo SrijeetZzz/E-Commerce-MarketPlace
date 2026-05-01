@@ -1,5 +1,6 @@
 import Navbar from "@/components/home/Navbar";
 import Footer from "@/components/home/Footer";
+import LayoutWrapper from "@/components/layout/LayoutWrapper";
 
 export default function BuyerLayout({
   children,
@@ -9,7 +10,7 @@ export default function BuyerLayout({
   return (
     <>
       <Navbar />
-      {children}
+      <LayoutWrapper>{children}</LayoutWrapper>
       <Footer />
     </>
   );
