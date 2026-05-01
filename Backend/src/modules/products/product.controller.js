@@ -92,8 +92,6 @@ const searchProducts = async (req, res) => {
   }
 };
 
-
-
 const createBulk = async (req, res) => {
   try {
     const adminId = req.user.id; // from auth
@@ -105,10 +103,7 @@ const createBulk = async (req, res) => {
       });
     }
 
-    const result = await productService.createBulkProducts(
-      adminId,
-      products
-    );
+    const result = await productService.createBulkProducts(adminId, products);
 
     return res.status(201).json({
       message: "Bulk products processed",
@@ -133,14 +128,9 @@ const updateImages = async (req, res) => {
       });
     }
 
-    const imageUrls = req.files.map(
-      (file) => `/uploads/${file.filename}`
-    );
+    const imageUrls = req.files.map((file) => `/uploads/${file.filename}`);
 
-    const updatedProduct = await productService.addProductImages(
-      id,
-      imageUrls
-    );
+    const updatedProduct = await productService.addProductImages(id, imageUrls);
 
     res.json({
       success: true,
@@ -154,11 +144,49 @@ const updateImages = async (req, res) => {
     });
   }
 };
+const getCatalog = async (req, res) => {
+  try {
+    const {
+      q,
+      minPrice,
+      maxPrice,
+      categoryId,
+      subCategoryId,
+      page,
+      limit,
+      sortBy,
+    } = req.query;
+
+    const data = await productService.getProductCatalog({
+      q,
+      minPrice,
+      maxPrice,
+      categoryId,
+      subCategoryId,
+      page,
+      limit,
+      sortBy,
+    });
+
+    res.json({
+      success: true,
+      ...data,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch catalog",
+    });
+  }
+};
+
 module.exports = {
   create,
   getAll,
   searchProducts,
   getById,
   createBulk,
-  updateImages
+  updateImages,
+  getCatalog,
 };

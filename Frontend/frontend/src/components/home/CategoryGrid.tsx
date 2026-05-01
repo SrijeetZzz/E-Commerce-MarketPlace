@@ -6,7 +6,9 @@ const CategoryGrid = ({ categories }: any) => {
   if (!categories || categories.length === 0) {
     return (
       <div className="flex h-40 items-center justify-center rounded-xl border-2 border-dashed border-gray-800">
-        <p className="text-gray-500 font-medium">No categories available at the moment.</p>
+        <p className="text-gray-500 font-medium">
+          No categories available at the moment.
+        </p>
       </div>
     );
   }
@@ -19,7 +21,7 @@ const CategoryGrid = ({ categories }: any) => {
           <CategoryCard key={cat._id} category={cat} />
         ))}
       </div>
-      
+
       {/* Decorative subtle background element (optional) */}
       <div className="mt-12 flex justify-center">
         <div className="h-px w-24 bg-linear-to-r from-transparent via-gray-700 to-transparent" />

@@ -3,16 +3,66 @@
 import { useState } from "react";
 
 const slides = [
-  { image: "/banner1.jpg", tag: "Top", subtitle: "Best Quality Wear", title: "Premium wear for modern living" },
-  { image: "/banner2.jpg", tag: "Soft", subtitle: "Minimal Lifestyle", title: "Clean aesthetics for everyday life" },
-  { image: "/banner3.jpg", tag: "Tech", subtitle: "Modern Electronics", title: "Smart devices for your lifestyle" },
-  { image: "/banner4.jpg", tag: "Home", subtitle: "Living Essentials", title: "Elevate your space with simplicity" },
-  { image: "/banner5.jpg", tag: "Beauty", subtitle: "Self Care", title: "Premium care for your skin" },
-  { image: "/banner8.jpg", tag: "Sneakers", subtitle: "Street Style", title: "Walk with confidence" },
-  { image: "/banner9.jpg", tag: "Men", subtitle: "Modern Fashion", title: "Sharp looks, timeless fits" },
-  { image: "/banner10.jpg", tag: "Women", subtitle: "Elegant Wear", title: "Grace in every detail" },
-  { image: "/banner11.jpg", tag: "Women", subtitle: "Elegant Wear", title: "Grace in every detail" },
-  { image: "/banner14.jpg", tag: "Women", subtitle: "Elegant Wear", title: "Grace in every detail" },
+  {
+    image: "/banner1.jpg",
+    tag: "Top",
+    subtitle: "Best Quality Wear",
+    title: "Premium wear for modern living",
+  },
+  {
+    image: "/banner2.jpg",
+    tag: "Soft",
+    subtitle: "Minimal Lifestyle",
+    title: "Clean aesthetics for everyday life",
+  },
+  {
+    image: "/banner3.jpg",
+    tag: "Tech",
+    subtitle: "Modern Electronics",
+    title: "Smart devices for your lifestyle",
+  },
+  {
+    image: "/banner4.jpg",
+    tag: "Home",
+    subtitle: "Living Essentials",
+    title: "Elevate your space with simplicity",
+  },
+  {
+    image: "/banner5.jpg",
+    tag: "Beauty",
+    subtitle: "Self Care",
+    title: "Premium care for your skin",
+  },
+  {
+    image: "/banner8.jpg",
+    tag: "Sneakers",
+    subtitle: "Street Style",
+    title: "Walk with confidence",
+  },
+  {
+    image: "/banner9.jpg",
+    tag: "Men",
+    subtitle: "Modern Fashion",
+    title: "Sharp looks, timeless fits",
+  },
+  {
+    image: "/banner10.jpg",
+    tag: "Women",
+    subtitle: "Elegant Wear",
+    title: "Grace in every detail",
+  },
+  {
+    image: "/banner11.jpg",
+    tag: "Women",
+    subtitle: "Elegant Wear",
+    title: "Grace in every detail",
+  },
+  {
+    image: "/banner14.jpg",
+    tag: "Women",
+    subtitle: "Elegant Wear",
+    title: "Grace in every detail",
+  },
 ];
 
 const HeroSection = () => {
@@ -21,7 +71,6 @@ const HeroSection = () => {
 
   return (
     <div className="relative left-1/2 right-1/2 w-screen -translate-x-1/2 h-screen overflow-hidden">
-
       {/* 🔥 BACKGROUND */}
       <div
         className="absolute inset-0 bg-cover bg-position-[center_top] transition-all duration-700"
@@ -33,7 +82,6 @@ const HeroSection = () => {
 
       {/* 🔥 CONTENT */}
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-
         {/* TAGS */}
         <div className="flex items-center gap-2 mb-4">
           <span className="bg-white text-black text-xs font-bold px-3 py-1 rounded-full">
@@ -62,7 +110,6 @@ const HeroSection = () => {
         {/* 🔥 THUMBNAILS */}
         <div className="absolute bottom-6 w-full flex justify-center">
           <div className="flex gap-2 px-4">
-
             {slides.map((slide, index) => (
               <div
                 key={index}
@@ -84,10 +131,8 @@ const HeroSection = () => {
                 </div>
               </div>
             ))}
-
           </div>
         </div>
-
       </div>
     </div>
   );

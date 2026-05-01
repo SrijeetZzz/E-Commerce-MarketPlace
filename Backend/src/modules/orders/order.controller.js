@@ -1,6 +1,8 @@
-// src/modules/orders/order.controller.js
-
 const orderService = require("./order.service");
+
+/* -----------------------------
+BUYER
+------------------------------ */
 
 const checkout = async (req, res) => {
   try {
@@ -22,6 +24,7 @@ const checkout = async (req, res) => {
     });
   }
 };
+
 const processPayment = async (req, res) => {
   try {
     const { success } = req.body;
@@ -38,27 +41,86 @@ const processPayment = async (req, res) => {
     });
   }
 };
+
 const getMyOrders = async (req, res) => {
   try {
     const data = await orderService.getMyOrders(req.user.id);
-    res.json({ data });
+
+    res.json({
+      data,
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({
+      message: error.message,
+    });
   }
 };
 
 const getOrderById = async (req, res) => {
   try {
     const data = await orderService.getOrderById(req.user.id, req.params.id);
-    res.json({ data });
+
+    res.json({
+      data,
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+/* -----------------------------
+SELLER
+------------------------------ */
+const getSellerOrders = async (req, res) => {
+  try {
+    const data = await orderService.getSellerOrders(req.user.id, req.query);
+
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateOrderItemStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const data = await orderService.updateOrderItemStatus(
+      req.user.id,
+      req.params.orderId,
+      req.params.itemId,
+      status,
+    );
+
+    res.json({
+      success: true,
+      message: "Order item updated",
+      data,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
 module.exports = {
+  // buyer
   checkout,
   processPayment,
   getMyOrders,
   getOrderById,
+
+  // seller
+  getSellerOrders,
+  updateOrderItemStatus,
 };

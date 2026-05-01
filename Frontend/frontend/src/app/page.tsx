@@ -34,30 +34,23 @@ const HomePage = () => {
 
   return (
     <main className="w-full">
-
       {/* HERO */}
       <HeroSection />
 
       {/* CONTENT */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0 py-10">
-
-        <h2 className="text-2xl font-semibold mb-6">
-          Shop by Category
-        </h2>
+        <h2 className="text-2xl font-semibold mb-6">Shop by Category</h2>
 
         {loading ? (
           <p className="text-gray-500">Loading categories...</p>
         ) : (
           <CategoryGrid categories={categories} />
         )}
-
       </section>
-      <BlogPage/>
-      <AboutPage/>
-      <ContactPage/>
-
+      <BlogPage />
+      <AboutPage />
+      <ContactPage />
     </main>
-    
   );
 };
 

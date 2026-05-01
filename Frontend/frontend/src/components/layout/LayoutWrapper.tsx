@@ -9,11 +9,22 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+
   const isHome = pathname === "/";
+
+  const fullWidthRoutes = ["/seller", "/admin"];
+
+  const isFullWidthLayout = fullWidthRoutes.some((route) =>
+    pathname.startsWith(route),
+  );
 
   return (
     <main className={isHome ? "" : "pt-16"}>
-      {isHome ? children : <Container>{children}</Container>}
+      {isHome || isFullWidthLayout ? (
+        children
+      ) : (
+        <Container>{children}</Container>
+      )}
     </main>
   );
 }

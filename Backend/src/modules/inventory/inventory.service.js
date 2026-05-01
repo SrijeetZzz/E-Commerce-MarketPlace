@@ -14,7 +14,7 @@ const reserveStock = async (listingId, quantity) => {
     {
       $inc: { reservedStock: quantity },
     },
-    { new: true }
+    { new: true },
   );
 
   if (!listing) {
@@ -31,7 +31,7 @@ const releaseStock = async (listingId, quantity) => {
     {
       $inc: { reservedStock: -quantity },
     },
-    { new: true }
+    { new: true },
   );
 };
 
@@ -45,7 +45,7 @@ const confirmStock = async (listingId, quantity) => {
         reservedStock: -quantity,
       },
     },
-    { new: true }
+    { new: true },
   );
 };
 

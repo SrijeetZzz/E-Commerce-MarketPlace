@@ -34,7 +34,7 @@ const listingSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["ACTIVE", "PENDING_APPROVAL", "REJECTED"],
+    enum: ["ACTIVE", "PENDING_APPROVAL", "REJECTED","PAUSED"],
     default: "PENDING_APPROVAL",
   },
 

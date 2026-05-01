@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 type Props = {
   onSuccess?: () => void;
@@ -21,48 +22,84 @@ const LoginForm = ({ onSuccess }: Props) => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // const handleSubmit = async (e: FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (!form.email || !form.password) {
+  //     toast.error("Please enter both email and password");
+  //     return;
+  //   }
+
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await api.post("/auth/login", form);
+  //     const resData = response.data as AuthResponse;
+
+  //     await login(resData);
+  //     toast.success("Welcome back! 👋");
+
+  //     if (onSuccess) onSuccess();
+  //   } catch (err: any) {
+  //     toast.error(err?.response?.data?.message || "Invalid credentials");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!form.email || !form.password) {
-      toast.error("Please enter both email and password");
-      return;
+  if (!form.email || !form.password) {
+    toast.error("Please enter both email and password");
+    return;
+  }
+
+  try {
+    setIsLoading(true);
+
+    const response = await api.post("/auth/login", form);
+    const resData = response.data as AuthResponse;
+
+    await login(resData);
+
+    // 🔥 EXTRACT ROLE DIRECTLY FROM RESPONSE
+    const role = resData.user.role;
+
+    toast.success("Welcome back! 👋");
+
+    // 🔥 REDIRECT BASED ON ROLE
+    if (role === "SELLER") {
+      router.push("/seller/orders");
+    } else if (role === "ADMIN") {
+      router.push("/admin");
+    } else {
+      router.push("/");
     }
-
-    try {
-      setIsLoading(true);
-      const response = await api.post("/auth/login", form);
-      const resData = response.data as AuthResponse;
-
-      await login(resData);
-      toast.success("Welcome back! 👋");
-
-      if (onSuccess) onSuccess();
-    } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Invalid credentials");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+     if (onSuccess) onSuccess();
+  } catch (err: any) {
+    toast.error(err?.response?.data?.message || "Invalid credentials");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="space-y-4">
-        
         {/* EMAIL ADDRESS */}
         <div className="space-y-2">
           <Label className="text-xs font-bold uppercase tracking-wider text-slate-500 ml-1">
             Email Address
           </Label>
           <div className="relative group">
-            <Mail 
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" 
-              size={18} 
+            <Mail
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors"
+              size={18}
             />
             <Input
               name="email"
@@ -82,14 +119,17 @@ const LoginForm = ({ onSuccess }: Props) => {
             <Label className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Password
             </Label>
-            <a href="#" className="text-[11px] font-bold text-indigo-600 hover:underline">
+            <a
+              href="#"
+              className="text-[11px] font-bold text-indigo-600 hover:underline"
+            >
               Forgot?
             </a>
           </div>
           <div className="relative group">
-            <Lock 
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" 
-              size={18} 
+            <Lock
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors"
+              size={18}
             />
             <Input
               name="password"
@@ -130,7 +170,9 @@ const LoginForm = ({ onSuccess }: Props) => {
       {/* SOCIAL DIVIDER */}
       <div className="flex items-center gap-4 my-2">
         <div className="h-1px bg-slate-100 flex-1" />
-        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">OR</span>
+        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+          OR
+        </span>
         <div className="h-1px bg-slate-100 flex-1" />
       </div>
 
@@ -140,10 +182,10 @@ const LoginForm = ({ onSuccess }: Props) => {
         variant="outline"
         className="w-full h-12 rounded-xl border-slate-200 hover:bg-slate-50 font-semibold text-slate-700 transition-all flex items-center justify-center gap-3"
       >
-        <img 
-          src="https://www.svgrepo.com/show/355037/google.svg" 
-          className="w-5 h-5" 
-          alt="Google" 
+        <img
+          src="https://www.svgrepo.com/show/355037/google.svg"
+          className="w-5 h-5"
+          alt="Google"
         />
         Continue with Google
       </Button>

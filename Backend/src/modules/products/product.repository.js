@@ -1,6 +1,6 @@
 const Listing = require("../listings/listing.model");
 const mongoose = require("mongoose");
-
+const Product = require("./product.model");
 exports.getGroupedProducts = async ({
   q,
   minPrice,
@@ -11,8 +11,7 @@ exports.getGroupedProducts = async ({
   page = 1,
   limit = 12,
 }) => {
-  const isValidObjectId = (id) =>
-    mongoose.Types.ObjectId.isValid(id);
+  const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
   // ✅ VALIDATE IDS
   const validCategoryId =
@@ -86,10 +85,7 @@ exports.getGroupedProducts = async ({
     { $unwind: "$product" },
 
     {
-      $match:
-        Object.keys(productMatch).length > 0
-          ? productMatch
-          : {},
+      $match: Object.keys(productMatch).length > 0 ? productMatch : {},
     },
 
     {
@@ -161,10 +157,7 @@ exports.getGroupedProducts = async ({
     { $unwind: "$product" },
 
     {
-      $match:
-        Object.keys(productMatch).length > 0
-          ? productMatch
-          : {},
+      $match: Object.keys(productMatch).length > 0 ? productMatch : {},
     },
 
     {
@@ -195,10 +188,7 @@ exports.getGroupedProducts = async ({
     { $unwind: "$product" },
 
     {
-      $match:
-        Object.keys(productMatch).length > 0
-          ? productMatch
-          : {},
+      $match: Object.keys(productMatch).length > 0 ? productMatch : {},
     },
 
     {
@@ -227,6 +217,148 @@ exports.getGroupedProducts = async ({
     priceRange: {
       min: globalMinPrice,
       max: globalMaxPrice,
+    },
+  };
+};
+
+exports.getProductCatalog = async ({
+  q,
+  minPrice,
+  maxPrice,
+  categoryId,
+  subCategoryId,
+  sortBy = "price_asc",
+  page = 1,
+  limit = 12,
+}) => {
+  const match = {};
+
+  if (q) {
+    match.title = {
+      $regex: q,
+      $options: "i",
+    };
+  }
+
+  if (categoryId && mongoose.Types.ObjectId.isValid(categoryId)) {
+    match.categoryId = new mongoose.Types.ObjectId(categoryId);
+  }
+
+  if (subCategoryId && mongoose.Types.ObjectId.isValid(subCategoryId)) {
+    match.subCategoryId = new mongoose.Types.ObjectId(subCategoryId);
+  }
+
+  if (minPrice || maxPrice) {
+    match["priceRange.min"] = {};
+    if (minPrice) {
+      match["priceRange.min"].$gte = Number(minPrice);
+    }
+    if (maxPrice) {
+      match["priceRange.min"].$lte = Number(maxPrice);
+    }
+  }
+
+  let sortStage = {
+    minPrice: 1,
+  };
+
+  if (sortBy === "price_desc") {
+    sortStage = {
+      minPrice: -1,
+    };
+  }
+
+  if (sortBy === "newest") {
+    sortStage = {
+      createdAt: -1,
+    };
+  }
+
+  const skip = (Number(page) - 1) * Number(limit);
+
+  const products = await Product.aggregate([
+    { $match: match },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $unwind: {
+        path: "$category",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "subcategories",
+        localField: "subCategoryId",
+        foreignField: "_id",
+        as: "subCategory",
+      },
+    },
+    {
+      $unwind: {
+        path: "$subCategory",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        brand: 1,
+        images: 1,
+        createdAt: 1,
+        categoryId: 1,
+        subCategoryId: 1,
+        category: "$category.name",
+        subCategory: "$subCategory.name",
+        listings: { $literal: [] },
+        minPrice: "$priceRange.min",
+        maxPrice: "$priceRange.max",
+        totalListings: { $literal: 0 },
+      },
+    },
+    { $sort: sortStage },
+    { $skip: skip },
+    { $limit: Number(limit) },
+  ]);
+
+  const total = await Product.countDocuments(match);
+
+  const globalPrice = await Product.aggregate([
+    {
+      $match: Object.keys(match)
+        .filter((k) => !k.includes("priceRange"))
+        .reduce((acc, key) => {
+          acc[key] = match[key];
+          return acc;
+        }, {}),
+    },
+    {
+      $group: {
+        _id: null,
+        minPrice: { $min: "$priceRange.min" },
+        maxPrice: { $max: "$priceRange.max" },
+      },
+    },
+  ]);
+
+  return {
+    data: products,
+    pagination: {
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / limit),
+    },
+    priceRange: {
+      min: globalPrice[0]?.minPrice || 0,
+      max: globalPrice[0]?.maxPrice || 0,
     },
   };
 };

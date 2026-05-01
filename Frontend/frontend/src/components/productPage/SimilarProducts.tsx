@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ProductListItem } from "@/types/product";
 import { fetchProducts } from "@/services/product";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast"; // ✅ added
+import toast from "react-hot-toast"; 
 
 import {
   Carousel,

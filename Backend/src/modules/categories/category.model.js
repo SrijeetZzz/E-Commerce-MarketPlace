@@ -7,6 +7,11 @@ const categorySchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    slug: {
+    type: String,
+    unique: true,
+    index: true
+  }
   },
   { timestamps: true }
 );

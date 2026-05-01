@@ -12,23 +12,35 @@ router.post(
   "/listings",
   authMiddleware,
   authorizeRoles("SELLER"),
-  listingController.create
+  listingController.create,
 );
 
 router.get(
   "/listings",
   authMiddleware,
   authorizeRoles("SELLER"),
-  listingController.getMy
+  listingController.getMy,
 );
 
 router.post(
   "/listings/bulk",
   authMiddleware,
   authorizeRoles("SELLER"),
-  listingController.createBulk
+  listingController.createBulk,
+);
+router.patch(
+  "/listings/:id",
+  authMiddleware,
+  authorizeRoles("SELLER"),
+  listingController.update,
 );
 
+router.delete(
+  "/listings/:id",
+  authMiddleware,
+  authorizeRoles("SELLER"),
+  listingController.remove,
+);
 router.get("/search", listingController.search);
 
 module.exports = router;

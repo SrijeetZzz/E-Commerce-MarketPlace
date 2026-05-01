@@ -231,7 +231,7 @@ const Navbar = () => {
                       src={
                         user?.avatar
                           ? `http://localhost:5000${user.avatar}`
-                          : "/placeholder.png"
+                          : "/images/placeholder.jpg"
                       }
                       className="w-9 h-9 rounded-full object-cover border border-white/20"
                     />
@@ -252,7 +252,7 @@ const Navbar = () => {
                         <Package size={16} /> Orders
                       </button>
                       <button
-                        onClick={() => router.push("/seller")}
+                        onClick={() => router.push("/seller/apply")}
                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-md font-semibold"
                       >
                         <Store size={16} /> Become Seller

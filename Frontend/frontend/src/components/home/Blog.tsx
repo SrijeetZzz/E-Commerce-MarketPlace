@@ -3,16 +3,33 @@
 import { ArrowUpRight } from "lucide-react";
 
 const posts = [
-  { title: "Summer Palette 2026", date: "April 15", category: "Trends", img: "/blog1.jpg" },
-  { title: "The Art of Minimalism", date: "April 12", category: "Style", img: "/blog2.jpg" },
-  { title: "Investing in Timeless Pieces", date: "April 10", category: "Guide", img: "/blog3.jpg" }
+  {
+    title: "Summer Palette 2026",
+    date: "April 15",
+    category: "Trends",
+    img: "/blog1.jpg",
+  },
+  {
+    title: "The Art of Minimalism",
+    date: "April 12",
+    category: "Style",
+    img: "/blog2.jpg",
+  },
+  {
+    title: "Investing in Timeless Pieces",
+    date: "April 10",
+    category: "Guide",
+    img: "/blog3.jpg",
+  },
 ];
 
 const BlogPage = () => {
   return (
     <main className="max-w-7xl mx-auto px-6 py-20 space-y-16">
       <header className="space-y-4">
-        <h1 className="text-5xl font-black tracking-tighter text-slate-900">The Journal</h1>
+        <h1 className="text-5xl font-black tracking-tighter text-slate-900">
+          The Journal
+        </h1>
         <p className="text-slate-500 font-medium">
           Stories, Style Guides, and Market Trends.
         </p>
@@ -21,7 +38,6 @@ const BlogPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {posts.map((post, i) => (
           <div key={i} className="group cursor-pointer">
-            
             {/* 🔥 FIXED ASPECT RATIO */}
             <div className="aspect-16/10 bg-slate-100 rounded-[32px] overflow-hidden mb-6">
               <img
@@ -29,7 +45,8 @@ const BlogPage = () => {
                 alt={post.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = "/placeholder.png";
+                  (e.currentTarget as HTMLImageElement).src =
+                    "/placeholder.png";
                 }}
               />
             </div>
@@ -52,7 +69,6 @@ const BlogPage = () => {
                 Read Story <ArrowUpRight size={16} />
               </div>
             </div>
-
           </div>
         ))}
       </div>

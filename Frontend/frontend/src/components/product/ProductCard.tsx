@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Star } from "lucide-react";
 import { addToCart } from "@/services/cart";
-import toast from "react-hot-toast"; // ✅ added
+import toast from "react-hot-toast"; 
 import { useAuth } from "../context/AuthContext";
 
 interface Props {

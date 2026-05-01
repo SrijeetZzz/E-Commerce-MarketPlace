@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRouter, useSearchParams, useParams } from "next/navigation";
@@ -78,11 +77,13 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <SlidersHorizontal size={18} className="text-slate-900" />
-          <h2 className="text-lg font-bold tracking-tight text-slate-900">Filters</h2>
+          <h2 className="text-lg font-bold tracking-tight text-slate-900">
+            Filters
+          </h2>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={clearFilters}
           className="h-8 px-2 text-slate-400 hover:text-slate-900 font-bold text-[11px] uppercase tracking-wider transition-colors"
         >
@@ -107,7 +108,11 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
           </SelectTrigger>
           <SelectContent className="rounded-2xl border-slate-100 shadow-xl">
             {categories.map((cat: any) => (
-              <SelectItem key={cat._id} value={cat._id} className="py-3 text-sm">
+              <SelectItem
+                key={cat._id}
+                value={cat._id}
+                className="py-3 text-sm"
+              >
                 {cat.name}
               </SelectItem>
             ))}
@@ -125,10 +130,18 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="rounded-2xl border-slate-100 shadow-xl">
-            <SelectItem value="price_asc" className="py-3 text-sm">Price: Low to High</SelectItem>
-            <SelectItem value="price_desc" className="py-3 text-sm">Price: High to Low</SelectItem>
-            <SelectItem value="newest" className="py-3 text-sm">Newest Arrivals</SelectItem>
-            <SelectItem value="popularity" className="py-3 text-sm">Most Popular</SelectItem>
+            <SelectItem value="price_asc" className="py-3 text-sm">
+              Price: Low to High
+            </SelectItem>
+            <SelectItem value="price_desc" className="py-3 text-sm">
+              Price: High to Low
+            </SelectItem>
+            <SelectItem value="newest" className="py-3 text-sm">
+              Newest Arrivals
+            </SelectItem>
+            <SelectItem value="popularity" className="py-3 text-sm">
+              Most Popular
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -150,11 +163,15 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 transition-colors hover:border-slate-200">
-            <p className="text-[9px] uppercase font-bold text-slate-400 mb-1">Min Price</p>
+            <p className="text-[9px] uppercase font-bold text-slate-400 mb-1">
+              Min Price
+            </p>
             <p className="text-sm font-bold text-slate-900">₹{range[0]}</p>
           </div>
           <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-right transition-colors hover:border-slate-200">
-            <p className="text-[9px] uppercase font-bold text-slate-400 mb-1">Max Price</p>
+            <p className="text-[9px] uppercase font-bold text-slate-400 mb-1">
+              Max Price
+            </p>
             <p className="text-sm font-bold text-slate-900">₹{range[1]}</p>
           </div>
         </div>
@@ -162,12 +179,15 @@ const FilterSidebar = ({ priceBounds, onApply }: any) => {
 
       {/* ACTION BUTTON */}
       <div className="pt-2">
-        <Button 
+        <Button
           onClick={applyFilters}
           className="w-full h-14 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold shadow-lg shadow-slate-200 transition-all active:scale-[0.98] group"
         >
           Update Results
-          <ChevronRight size={18} className="ml-2 group-hover:translate-x-1 transition-transform" />
+          <ChevronRight
+            size={18}
+            className="ml-2 group-hover:translate-x-1 transition-transform"
+          />
         </Button>
       </div>
     </aside>

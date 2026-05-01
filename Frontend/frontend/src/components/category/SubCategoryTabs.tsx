@@ -38,7 +38,9 @@ const SubCategoryTabs = ({ subcategories, active, setActive }: Props) => {
             `}
           >
             <div className="flex items-center justify-center gap-2 px-1">
-              {isActive && <Check size={14} strokeWidth={3} className="shrink-0" />}
+              {isActive && (
+                <Check size={14} strokeWidth={3} className="shrink-0" />
+              )}
               <span className="truncate leading-tight">{tab.name}</span>
             </div>
 

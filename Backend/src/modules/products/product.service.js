@@ -186,7 +186,9 @@ const addProductImages = async (productId, imageUrls) => {
 
   return product;
 };
-
+const getProductCatalog = async (filters) => {
+  return await productRepository.getProductCatalog(filters);
+};
 module.exports = {
   createProduct,
   getAllProducts,
@@ -194,4 +196,5 @@ module.exports = {
   getProductById,
   createBulkProducts,
   addProductImages,
+  getProductCatalog,
 };

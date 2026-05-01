@@ -3,7 +3,19 @@ const Listing = require("../listings/listing.model");
 const Order = require("./order.model");
 const inventoryService = require("../inventory/inventory.service");
 
-const checkout = async (userId,address) => {
+/* -----------------------------------
+HELPERS
+----------------------------------- */
+
+const generateTrackingId = () => {
+  return "TRK-" + Date.now() + "-" + Math.floor(1000 + Math.random() * 9000);
+};
+
+/* -----------------------------------
+BUYER CHECKOUT
+----------------------------------- */
+
+const checkout = async (userId, address) => {
   const cart = await Cart.findOne({ userId });
 
   if (!cart || cart.items.length === 0) {
@@ -11,11 +23,11 @@ const checkout = async (userId,address) => {
   }
 
   let totalAmount = 0;
+
   const orderItems = [];
-  const reservedItems = []; // 🔥 track reservations
+  const reservedItems = [];
 
   try {
-    // 🔥 VALIDATE + RESERVE
     for (const item of cart.items) {
       const listing = await Listing.findById(item.listingId);
 
@@ -27,13 +39,9 @@ const checkout = async (userId,address) => {
         throw new Error("Price changed, please update cart");
       }
 
-      // 🔥 RESERVE
-      await inventoryService.reserveStock(
-        listing._id,
-        item.quantity
-      );
+      // reserve stock
+      await inventoryService.reserveStock(listing._id, item.quantity);
 
-      // track for rollback
       reservedItems.push({
         listingId: listing._id,
         quantity: item.quantity,
@@ -45,39 +53,47 @@ const checkout = async (userId,address) => {
         listingId: listing._id,
         quantity: item.quantity,
         price: listing.price,
+
+        // NEW seller fulfillment fields
+        fulfillmentStatus: "NEW",
+        trackingId: null,
+        shippedAt: null,
+        deliveredAt: null,
       });
     }
 
-    // 🔥 CREATE ORDER
     const order = await Order.create({
       buyerId: userId,
       totalAmount,
       items: orderItems,
-      address
+      address,
     });
 
-    // 🔥 CLEAR CART
+    // clear cart
     cart.items = [];
     await cart.save();
 
     return order;
-
   } catch (error) {
-    // 🔥 ROLLBACK RESERVED STOCK
+    // rollback reservations
     for (const item of reservedItems) {
-      await inventoryService.releaseStock(
-        item.listingId,
-        item.quantity
-      );
+      await inventoryService.releaseStock(item.listingId, item.quantity);
     }
 
     throw error;
   }
 };
+
+/* -----------------------------------
+PAYMENT PROCESSING
+----------------------------------- */
+
 const processPayment = async (orderId, isSuccess) => {
   const order = await Order.findById(orderId);
 
-  if (!order) throw new Error("Order not found");
+  if (!order) {
+    throw new Error("Order not found");
+  }
 
   if (order.status !== "PLACED") {
     throw new Error("Order already processed");
@@ -85,23 +101,14 @@ const processPayment = async (orderId, isSuccess) => {
 
   try {
     if (isSuccess) {
-      // ✅ CONFIRM STOCK
       for (const item of order.items) {
-        await inventoryService.confirmStock(
-          item.listingId,
-          item.quantity
-        );
+        await inventoryService.confirmStock(item.listingId, item.quantity);
       }
 
       order.status = "CONFIRMED";
-
     } else {
-      // ❌ RELEASE STOCK
       for (const item of order.items) {
-        await inventoryService.releaseStock(
-          item.listingId,
-          item.quantity
-        );
+        await inventoryService.releaseStock(item.listingId, item.quantity);
       }
 
       order.status = "CANCELLED";
@@ -110,13 +117,19 @@ const processPayment = async (orderId, isSuccess) => {
     await order.save();
 
     return order;
-
   } catch (error) {
     throw error;
   }
-};// 🔥 GET ALL ORDERS (for logged-in user)
+};
+
+/* -----------------------------------
+BUYER ORDERS
+----------------------------------- */
+
 const getMyOrders = async (userId) => {
-  return await Order.find({ buyerId: userId })
+  return await Order.find({
+    buyerId: userId,
+  })
     .populate({
       path: "items.listingId",
       populate: {
@@ -124,10 +137,11 @@ const getMyOrders = async (userId) => {
         select: "title images",
       },
     })
-    .sort({ createdAt: -1 });
+    .sort({
+      createdAt: -1,
+    });
 };
 
-// 🔥 GET SINGLE ORDER
 const getOrderById = async (userId, orderId) => {
   const order = await Order.findOne({
     _id: orderId,
@@ -147,9 +161,236 @@ const getOrderById = async (userId, orderId) => {
   return order;
 };
 
+/* -----------------------------------
+SELLER ORDERS
+----------------------------------- */
+const getSellerOrders = async (sellerId, query = {}) => {
+  let {
+    page = 1,
+    limit = 10,
+    fulfillmentStatus,
+    orderStatus,
+    sort = "newest",
+    dateFrom,
+    dateTo,
+  } = query;
+
+  page = Number(page);
+  limit = Number(limit);
+
+  /* =========================
+Fetch Orders
+========================= */
+
+  let orders = await Order.find({})
+    .populate({
+      path: "buyerId",
+      select: "name email",
+    })
+    .populate({
+      path: "items.listingId",
+      populate: {
+        path: "productId",
+        select: "title images",
+      },
+    });
+
+  /* =========================
+Keep seller-owned items only
+(multiseller safe)
+========================= */
+
+  orders = orders
+    .map((order) => {
+      const sellerItems = order.items.filter(
+        (item) => item.listingId?.sellerId?.toString() === sellerId,
+      );
+
+      const sellerAmount = sellerItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
+
+      return {
+        ...order.toObject(),
+        items: sellerItems,
+        sellerAmount,
+      };
+    })
+    .filter((order) => order.items.length > 0);
+
+  /* =========================
+Order-level filters
+========================= */
+
+  if (orderStatus) {
+    orders = orders.filter((order) => order.status === orderStatus);
+  }
+
+  if (dateFrom) {
+    const from = new Date(dateFrom);
+
+    orders = orders.filter((order) => new Date(order.createdAt) >= from);
+  }
+
+  if (dateTo) {
+    const to = new Date(dateTo);
+
+    orders = orders.filter((order) => new Date(order.createdAt) <= to);
+  }
+
+  /* =========================
+GLOBAL COUNTS
+(before tab filter)
+========================= */
+
+  const allItems = orders.flatMap((o) => o.items);
+
+  const counts = {
+    NEW: allItems.filter((i) => i.fulfillmentStatus === "NEW").length,
+
+    PACKING: allItems.filter((i) => i.fulfillmentStatus === "PACKING").length,
+
+    SHIPPED: allItems.filter((i) => i.fulfillmentStatus === "SHIPPED").length,
+
+    DELIVERED: allItems.filter((i) => i.fulfillmentStatus === "DELIVERED")
+      .length,
+  };
+
+  /* =========================
+Tab fulfillment filter
+(filter actual line items)
+========================= */
+
+  if (fulfillmentStatus) {
+    orders = orders
+      .map((order) => ({
+        ...order,
+
+        items: order.items.filter(
+          (item) => item.fulfillmentStatus === fulfillmentStatus,
+        ),
+      }))
+      .filter((order) => order.items.length > 0);
+  }
+
+  /* =========================
+Sorting
+========================= */
+
+  switch (sort) {
+    case "oldest":
+      orders.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+      break;
+
+    case "amountHigh":
+      orders.sort((a, b) => b.sellerAmount - a.sellerAmount);
+
+      break;
+
+    case "amountLow":
+      orders.sort((a, b) => a.sellerAmount - b.sellerAmount);
+
+      break;
+
+    default:
+      orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }
+
+  /* =========================
+Pagination
+========================= */
+
+  const total = orders.length;
+
+  const start = (page - 1) * limit;
+
+  const paginated = orders.slice(start, start + limit);
+
+  return {
+    data: paginated,
+
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+
+    counts,
+  };
+};
+/* -----------------------------------
+SELLER UPDATE ITEM STATUS
+----------------------------------- */
+
+const updateOrderItemStatus = async (sellerId, orderId, itemId, newStatus) => {
+  const allowedStatuses = ["NEW", "PACKING", "SHIPPED", "DELIVERED"];
+
+  if (!allowedStatuses.includes(newStatus)) {
+    throw new Error("Invalid status");
+  }
+
+  const order = await Order.findById(orderId).populate({
+    path: "items.listingId",
+    select: "sellerId productId price stock",
+  });
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  const item = order.items.id(itemId);
+
+  if (!item) {
+    throw new Error("Order item not found");
+  }
+
+  if (item.listingId.sellerId.toString() !== sellerId) {
+    throw new Error("Unauthorized");
+  }
+
+  // progression rules
+  const flow = {
+    NEW: 1,
+    PACKING: 2,
+    SHIPPED: 3,
+    DELIVERED: 4,
+  };
+
+  if (flow[newStatus] < flow[item.fulfillmentStatus]) {
+    throw new Error("Cannot move backwards");
+  }
+
+  if (flow[newStatus] > flow[item.fulfillmentStatus] + 1) {
+    throw new Error("Invalid status progression");
+  }
+
+  item.fulfillmentStatus = newStatus;
+
+  if (newStatus === "SHIPPED" && !item.trackingId) {
+    item.trackingId = generateTrackingId();
+
+    item.shippedAt = new Date();
+  }
+
+  if (newStatus === "DELIVERED") {
+    item.deliveredAt = new Date();
+  }
+
+  await order.save();
+
+  return order;
+};
+
 module.exports = {
   checkout,
-   processPayment,
-   getOrderById,
-   getMyOrders,
+  processPayment,
+
+  getMyOrders,
+  getOrderById,
+
+  getSellerOrders,
+  updateOrderItemStatus,
 };
