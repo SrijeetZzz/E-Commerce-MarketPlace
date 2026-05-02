@@ -644,28 +644,32 @@ Permissions Helpers
       </div>
 
       {/* PAGINATION */}
-      <div className="flex justify-between items-center p-8 bg-slate-900 rounded-[2.5rem] shadow-2xl text-white">
-        <p className="text-[11px] font-black uppercase text-slate-400 tracking-widest">
+      <div className="flex justify-between items-center p-4 bg-slate-900 rounded-2xl shadow-xl text-white">
+        {/* TEXT */}
+        <p className="text-[10px] font-semibold uppercase text-slate-400 tracking-widest">
           Showing Page
           <span className="text-white"> {pagination.page} </span>
           of {pagination.totalPages}
         </p>
 
-        <div className="flex gap-4 items-center">
+        {/* CONTROLS */}
+        <div className="flex gap-2 items-center">
+          {/* PREV */}
           <Button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="rounded-xl border border-slate-700 bg-slate-800"
+            className="rounded-lg border border-slate-700 bg-slate-800 w-9 h-9 hover:bg-slate-700"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={16} />
           </Button>
 
-          <div className="flex gap-2">
+          {/* PAGE NUMBERS */}
+          <div className="flex gap-1">
             {getPaginationRange().map((n, i) =>
               n === "..." ? (
                 <span
                   key={`dots-${i}`}
-                  className="px-2 text-slate-500 font-bold self-end pb-2"
+                  className="px-1 text-slate-500 text-xs font-bold self-center"
                 >
                   ...
                 </span>
@@ -673,9 +677,9 @@ Permissions Helpers
                 <button
                   key={`page-${n}-${i}`}
                   onClick={() => setPage(Number(n))}
-                  className={`h-11 w-11 rounded-xl text-sm font-black transition-all ${
+                  className={`h-9 w-9 rounded-lg text-xs font-semibold transition-all ${
                     page === n
-                      ? "bg-white text-slate-900 scale-110 shadow-lg"
+                      ? "bg-white text-slate-900 shadow-sm"
                       : "text-slate-400 hover:bg-slate-800 hover:text-white"
                   }`}
                 >
@@ -685,12 +689,13 @@ Permissions Helpers
             )}
           </div>
 
+          {/* NEXT */}
           <Button
             disabled={page === pagination.totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="rounded-xl border border-slate-700 bg-slate-800"
+            className="rounded-lg border border-slate-700 bg-slate-800 w-9 h-9 hover:bg-slate-700"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={16} />
           </Button>
         </div>
       </div>

@@ -2,6 +2,7 @@ const Cart = require("../cart/cart.model");
 const Listing = require("../listings/listing.model");
 const Order = require("./order.model");
 const inventoryService = require("../inventory/inventory.service");
+const OrderStatusHistory = require("./orderStatusHistory.model");
 
 /* -----------------------------------
 HELPERS
@@ -68,6 +69,15 @@ const checkout = async (userId, address) => {
       items: orderItems,
       address,
     });
+    // 🔥 CREATE INITIAL TIMELINE (VERY IMPORTANT)
+    for (const item of order.items) {
+      await OrderStatusHistory.create({
+        orderId: order._id,
+        itemId: item._id,
+        status: "NEW",
+        updatedBy: userId,
+      });
+    }
 
     // clear cart
     cart.items = [];
@@ -368,6 +378,12 @@ const updateOrderItemStatus = async (sellerId, orderId, itemId, newStatus) => {
   }
 
   item.fulfillmentStatus = newStatus;
+  await OrderStatusHistory.create({
+    orderId: order._id,
+    itemId: item._id,
+    status: newStatus,
+    updatedBy: sellerId,
+  });
 
   if (newStatus === "SHIPPED" && !item.trackingId) {
     item.trackingId = generateTrackingId();

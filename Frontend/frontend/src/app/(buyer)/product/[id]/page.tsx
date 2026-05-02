@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { addToCart } from "@/services/cart";
 import { getProductById } from "@/services/product";
-import SimilarProducts from "@/components/productPage/SimilarProducts";
+import SimilarProducts from "@/components/product/SimilarProducts";
 import { ProductDetail, Listing } from "@/types/product";
 
 import {
@@ -46,7 +46,7 @@ const ProductPage = () => {
         const data = await getProductById(id as string);
         setProduct(data);
 
-        if (data.listings.length) {
+        if (data?.listings?.length) {
           const cheapest = [...data.listings].sort(
             (a, b) => a.price - b.price,
           )[0];
@@ -91,8 +91,9 @@ const ProductPage = () => {
       </div>
     );
 
-  const validImages = product.images.filter((img) => img && img.trim() !== "");
-
+  const validImages = product.images?.filter(
+  (img) => img && img.trim() !== ""
+) || [];
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 md:py-8">
@@ -113,7 +114,7 @@ const ProductPage = () => {
                   src={
                     validImages[currentImage]
                       ? `${BASE_URL}${validImages[currentImage]}`
-                      : "/placeholder.png"
+                      : "/images/placeholder.jpg"
                   }
                   alt={product.title}
                   className="w-full h-full object-contain mix-blend-multiply hover:scale-105 transition-transform duration-500 p-4"
@@ -172,7 +173,7 @@ const ProductPage = () => {
             <div className="space-y-4">
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl md:text-4xl font-black text-slate-900">
-                  ₹{selectedListing?.price.toLocaleString()}
+                  ₹{selectedListing?.price?.toLocaleString() || "—"}
                 </span>
                 <span className="text-lg md:text-xl text-muted-foreground line-through decoration-slate-300">
                   ₹{(selectedListing?.price! * 1.2).toFixed(0)}

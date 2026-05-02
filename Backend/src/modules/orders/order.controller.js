@@ -1,5 +1,5 @@
 const orderService = require("./order.service");
-
+const OrderStatusHistory = require("./orderStatusHistory.model");
 /* -----------------------------
 BUYER
 ------------------------------ */
@@ -113,6 +113,29 @@ const updateOrderItemStatus = async (req, res) => {
   }
 };
 
+const getOrderItemTimeline = async (req, res) => {
+  try {
+    const { orderId, itemId } = req.params;
+
+    const history = await OrderStatusHistory.find({
+      orderId,
+      itemId,
+    })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    res.json({
+      success: true,
+      data: history,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch timeline",
+    });
+  }
+};
+
 module.exports = {
   // buyer
   checkout,
@@ -123,4 +146,5 @@ module.exports = {
   // seller
   getSellerOrders,
   updateOrderItemStatus,
+  getOrderItemTimeline,
 };

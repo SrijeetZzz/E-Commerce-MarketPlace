@@ -360,25 +360,27 @@ export default function SellerOrdersPage() {
       </div>
 
       {/* PAGINATION */}
-      <div className="flex justify-between items-center bg-slate-900 rounded-[3rem] p-8 text-white shadow-2xl">
-        <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+      <div className="flex justify-between items-center bg-slate-900 rounded-2xl p-4 text-white shadow-xl">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
           Showing Page <span className="text-white">{pagination.page}</span> of{" "}
           {pagination.totalPages}
         </p>
-        <div className="flex gap-4">
+
+        <div className="flex gap-2">
           <Button
             disabled={page === 1}
             onClick={() => setPage((p) => p - 1)}
-            className="bg-slate-800 rounded-2xl hover:bg-slate-700 w-14 h-14 transition-all"
+            className="bg-slate-800 rounded-xl hover:bg-slate-700 w-10 h-10 transition-all"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={18} />
           </Button>
+
           <Button
             disabled={page === pagination.totalPages}
             onClick={() => setPage((p) => p + 1)}
-            className="bg-slate-800 rounded-2xl hover:bg-slate-700 w-14 h-14 transition-all"
+            className="bg-slate-800 rounded-xl hover:bg-slate-700 w-10 h-10 transition-all"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={18} />
           </Button>
         </div>
       </div>

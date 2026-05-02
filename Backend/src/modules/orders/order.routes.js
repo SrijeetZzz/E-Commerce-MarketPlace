@@ -36,7 +36,11 @@ router.patch(
   authorizeRoles("SELLER"),
   orderController.updateOrderItemStatus,
 );
-
+router.get(
+  "/seller/orders/:orderId/items/:itemId/timeline",
+  authorizeRoles("SELLER"),
+  orderController.getOrderItemTimeline,
+);
 /* -------------------------
 SINGLE ORDER
 MUST STAY LAST

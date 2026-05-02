@@ -85,7 +85,7 @@ const SimilarProducts = ({ product }: Props) => {
         <CarouselContent className="-ml-4">
           {similarProducts.map((item) => {
             const validImage = item.images?.find((img) => img && img.trim() !== "");
-            const imageUrl = validImage ? `${BASE_URL}${validImage}` : "/placeholder.png";
+            const imageUrl = validImage ? `${BASE_URL}${validImage}` : "/images/placeholder.jpg";
             
             // 🔥 Discount Logic
             const sellingPrice = item.minPrice;
@@ -107,7 +107,7 @@ const SimilarProducts = ({ product }: Props) => {
                       src={imageUrl}
                       alt={item.title}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      onError={(e) => (e.currentTarget.src = "/placeholder.png")}
+                      onError={(e) => (e.currentTarget.src = "/images/placeholder.jpg")}
                     />
                     
                     {/* Discount Badge */}
