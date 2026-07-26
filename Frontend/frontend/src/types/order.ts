@@ -1,3 +1,5 @@
+
+
 export interface Address {
   _id: string;
   fullName: string;
@@ -17,6 +19,13 @@ export interface AddressForm {
   state: string;
   pincode: string;
 }
+export interface OrderSeller {
+  _id: string;
+  name: string;
+  email: string;
+  shopName?: string;
+}
+
 
 /* ========================= Order Status ========================= */
 export type OrderStatus = "PLACED" | "CONFIRMED" | "CANCELLED";
@@ -39,12 +48,13 @@ export interface OrderProduct {
   _id: string;
   title: string;
   images: string[];
+  description?: string;
 }
 
 /* ========================= Listing Snapshot ========================= */
 export interface OrderListing {
   _id: string;
-  sellerId: string;
+  sellerId: string | OrderSeller;
   productId: OrderProduct;
   price?: number;
   stock?: number;
@@ -106,4 +116,26 @@ export interface SellerOrdersPayload {
 export interface SellerOrdersResponse {
   success: boolean;
   data: SellerOrdersPayload;
+}
+//===========================ADMIN ORDERS=========================//
+export interface GetAdminOrdersParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  sort?: string;
+}
+
+export interface AdminOrdersResponse {
+  data: Order[];
+  pagination: Pagination;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  pages: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
 }

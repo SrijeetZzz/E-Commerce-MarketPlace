@@ -92,11 +92,15 @@ const remove = async (req, res) => {
 // get all listings
 const getAll = async (req, res) => {
   try {
-    const data = await listingService.getAllListings();
+    const result = await listingService.getAllListings(req.query);
 
-    res.json({ data });
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
   } catch (error) {
     res.status(400).json({
+      success: false,
       message: error.message,
     });
   }
@@ -149,6 +153,33 @@ const search = async (req, res) => {
   }
 };
 
+const getListingById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const listing = await listingService.getListingById(id);
+
+    if (!listing) {
+      return res.status(404).json({
+        success: false,
+        message: "Listing not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: listing,
+    });
+  } catch (error) {
+    console.error("Get Listing Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch listing",
+    });
+  }
+};
+
 module.exports = {
   // seller
   create,
@@ -162,4 +193,5 @@ module.exports = {
   approve,
   reject,
   search,
+  getListingById
 };

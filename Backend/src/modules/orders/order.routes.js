@@ -9,6 +9,29 @@ const authorizeRoles = require("../../shared/middlewares/role.middleware");
 
 router.use(authMiddleware);
 
+
+/* -------------------------
+ADMIN ROUTES
+-------------------------- */
+
+router.get(
+  "/admin/orders",
+  authorizeRoles("ADMIN"),
+  orderController.getAdminOrders
+);
+
+router.get(
+  "/admin/orders/:id",
+  authorizeRoles("ADMIN"),
+  orderController.getAdminOrderById
+);
+
+router.patch(
+  "/admin/orders/:id/status",
+  authorizeRoles("ADMIN"),
+  orderController.updateOrderStatus
+);
+
 /* -------------------------
 BUYER ROUTES
 -------------------------- */

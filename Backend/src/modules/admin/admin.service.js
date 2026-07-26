@@ -1,8 +1,50 @@
 const SellerApplication = require("../sellers/seller.model");
 const User = require("../auth/auth.model");
+const paginate = require("../../shared/utils/pagination");
+const getSort = require("../../shared/utils/sorting");
+const buildSellerSearch = require("../../shared/utils/search/buildSellerSearch");
 
-const getAllApplications = async () => {
-  return await SellerApplication.find().populate("userId", "name email");
+
+const getAllSellers = async () => {
+  const sellers = await User.find(
+    { role: "SELLER" },
+    "name email"
+  ).sort({ name: 1 });
+
+  return sellers;
+};
+
+const getAllApplications = async (queryParams) => {
+  const {
+    page = 1,
+    limit = 10,
+    sort = "latest",
+    search = "",
+    status,
+  } = queryParams;
+
+  const query = buildSellerSearch(search);
+
+  if (status) {
+    query.status = status;
+  }
+
+  const {
+    skip,
+    limit: pageSize,
+    pagination,
+  } = await paginate(SellerApplication, query, page, limit);
+
+  const applications = await SellerApplication.find(query)
+    .populate("userId", "name email")
+    .sort(getSort(sort))
+    .skip(skip)
+    .limit(pageSize);
+
+  return {
+    data: applications,
+    pagination,
+  };
 };
 
 const approveApplication = async (applicationId) => {
@@ -53,4 +95,5 @@ module.exports = {
   getAllApplications,
   approveApplication,
   rejectApplication,
+  getAllSellers
 };

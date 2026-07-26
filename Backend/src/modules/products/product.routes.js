@@ -31,6 +31,23 @@ router.post(
   authorizeRoles("ADMIN"),
   productController.createBulk,
 );
+
+router.patch(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN"),
+  upload.array("images", 5), // if updating images together
+  productController.update,
+);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  authorizeRoles("ADMIN"),
+  productController.remove,
+);
+
+
 router.get(
   "/catalog",
   authMiddleware,

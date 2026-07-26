@@ -28,10 +28,11 @@ const create = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const products = await productService.getAllProducts();
+    const result = await productService.getAllProducts(req.query);
 
     res.status(200).json({
-      data: products,
+      success: true,
+      ...result,
     });
   } catch (error) {
     res.status(400).json({
@@ -39,6 +40,7 @@ const getAll = async (req, res) => {
     });
   }
 };
+
 const getById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -181,6 +183,43 @@ const getCatalog = async (req, res) => {
   }
 };
 
+const update = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await productService.updateProduct(id, req.body);
+
+    res.json({
+      success: true,
+      message: "Product updated successfully",
+      data: product,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+const remove = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await productService.deleteProduct(id);
+
+    res.json({
+      success: true,
+      message: "Product deleted successfully",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   create,
   getAll,
@@ -189,4 +228,6 @@ module.exports = {
   createBulk,
   updateImages,
   getCatalog,
+  update,
+  remove,
 };

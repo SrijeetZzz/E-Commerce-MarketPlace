@@ -6,5 +6,6 @@ export interface AuthResponse {
     email: string;
     role: string;
     avatar:string,
+    isVerified:boolean,
   };
 }

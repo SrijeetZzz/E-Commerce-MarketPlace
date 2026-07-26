@@ -536,7 +536,7 @@ const Navbar = () => {
 
       {/* AUTH MODAL */}
       <Dialog open={authOpen} onOpenChange={setAuthOpen}>
-        <DialogContent className="sm:max-w-125 p-0">
+        <DialogContent className="sm:max-w-125 p-0 rounded-3xl overflow-hidden">
           <div className="bg-white p-8">
             <DialogHeader className="mb-6">
               <DialogTitle className="text-2xl text-center">

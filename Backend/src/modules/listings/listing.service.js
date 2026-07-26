@@ -3,6 +3,9 @@
 const Listing = require("./listing.model");
 const Product = require("../products/product.model");
 const mongoose = require("mongoose");
+const paginate = require("../../shared/utils/pagination");
+const getSort = require("../../shared/utils/sorting");
+
 
 const createListing = async (sellerId, data) => {
   const { productId, price, stock } = data;
@@ -290,8 +293,66 @@ const getMyListings = async (sellerId, filters = {}) => {
   };
 };
 
-const getAllListings = async () => {
-  return await Listing.find().populate("productId", "title");
+const getListingById = async (id) => {
+  return await Listing.findById(id)
+    .populate({
+      path: "productId",
+      populate: [
+        {
+          path: "categoryId",
+          select: "name",
+        },
+        {
+          path: "subCategoryId",
+          select: "name",
+        },
+      ],
+    })
+    .populate(
+      "sellerId",
+      "name email shopName phone"
+    );
+};
+
+
+const getAllListings = async (queryParams) => {
+  const {
+    page = 1,
+    limit = 10,
+    sort = "latest",
+    status,
+    sellerId,
+  } = queryParams;
+
+  const query = {};
+
+  // Status filter
+  if (status) {
+    query.status = status;
+  }
+
+  // Seller filter
+  if (sellerId) {
+    query.sellerId = sellerId;
+  }
+
+  const {
+    skip,
+    limit: pageSize,
+    pagination,
+  } = await paginate(Listing, query, page, limit);
+
+  const listings = await Listing.find(query)
+    .populate("productId", "title")
+    .populate("sellerId", "name email")
+    .sort(getSort(sort))
+    .skip(skip)
+    .limit(pageSize);
+
+  return {
+    data: listings,
+    pagination,
+  };
 };
 
 const approveListing = async (id) => {
@@ -465,4 +526,5 @@ module.exports = {
   createBulkListings,
   updateListing,
   deleteListing,
+  getListingById
 };

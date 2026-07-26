@@ -1,12 +1,35 @@
 const adminService = require("./admin.service");
 
+const getAllSellers = async (req, res) => {
+  try {
+    const sellers = await adminService.getAllSellers();
+
+    res.status(200).json({
+      success: true,
+      data: sellers,
+    });
+  } catch (error) {
+    console.error("Get Sellers Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch sellers",
+    });
+  }
+};
+
 const getApplications = async (req, res) => {
   try {
-    const data = await adminService.getAllApplications();
+    const result = await adminService.getAllApplications(req.query);
 
-    res.json({ data });
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({
+      message: error.message,
+    });
   }
 };
 
@@ -45,4 +68,5 @@ module.exports = {
   getApplications,
   approve,
   reject,
+  getAllSellers
 };

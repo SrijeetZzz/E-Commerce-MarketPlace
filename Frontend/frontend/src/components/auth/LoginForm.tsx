@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Props = {
   onSuccess?: () => void;
@@ -27,66 +28,47 @@ const LoginForm = ({ onSuccess }: Props) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
-  // const handleSubmit = async (e: FormEvent) => {
-  //   e.preventDefault();
-
-  //   if (!form.email || !form.password) {
-  //     toast.error("Please enter both email and password");
-  //     return;
-  //   }
-
-  //   try {
-  //     setIsLoading(true);
-  //     const response = await api.post("/auth/login", form);
-  //     const resData = response.data as AuthResponse;
-
-  //     await login(resData);
-  //     toast.success("Welcome back! 👋");
-
-  //     if (onSuccess) onSuccess();
-  //   } catch (err: any) {
-  //     toast.error(err?.response?.data?.message || "Invalid credentials");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
   const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!form.email || !form.password) {
-    toast.error("Please enter both email and password");
-    return;
-  }
-
-  try {
-    setIsLoading(true);
-
-    const response = await api.post("/auth/login", form);
-    const resData = response.data as AuthResponse;
-
-    await login(resData);
-
-    // 🔥 EXTRACT ROLE DIRECTLY FROM RESPONSE
-    const role = resData.user.role;
-
-    toast.success("Welcome back! 👋");
-
-    // 🔥 REDIRECT BASED ON ROLE
-    if (role === "SELLER") {
-      router.push("/seller/profile");
-    } else if (role === "ADMIN") {
-      router.push("/admin");
-    } else {
-      router.push("/");
+    if (!form.email || !form.password) {
+      toast.error("Please enter both email and password");
+      return;
     }
-     if (onSuccess) onSuccess();
-  } catch (err: any) {
-    toast.error(err?.response?.data?.message || "Invalid credentials");
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+    try {
+      setIsLoading(true);
+
+      const response = await api.post("/auth/login", form);
+      const resData = response.data as AuthResponse;
+
+      await login(resData);
+
+      // 🔥 EXTRACT ROLE DIRECTLY FROM RESPONSE
+      const role = resData.user.role;
+      const isVerified = resData.user.isVerified;
+
+      toast.success("Welcome back! 👋");
+
+      // 🔥 REDIRECT BASED ON ROLE
+      if (role === "SELLER") {
+        if (isVerified) {
+          router.push("/seller-dashboard/dashboard");
+        } else {
+          router.push("/seller/application-status");
+        }
+      } else if (role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
+      if (onSuccess) onSuccess();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Invalid credentials");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
@@ -189,6 +171,17 @@ const LoginForm = ({ onSuccess }: Props) => {
         />
         Continue with Google
       </Button>
+      <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+        <p className="text-sm text-slate-500">
+          Don&apos;t have an account yet?{" "}
+          <Link
+            href="/register"
+            className="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors"
+          >
+            Create an account
+          </Link>
+        </p>
+      </div>
     </form>
   );
 };

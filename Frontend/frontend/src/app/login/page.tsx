@@ -34,18 +34,6 @@ const LoginPage = () => {
 
         <CardContent className="pt-2 pb-10 px-8 md:px-12">
           <LoginForm/>
-          
-          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-            <p className="text-sm text-slate-500">
-              Don&apos;t have an account yet?{" "}
-              <a 
-                href="/register" 
-                className="text-indigo-600 font-semibold hover:text-indigo-700 transition-colors"
-              >
-                Create an account
-              </a>
-            </p>
-          </div>
         </CardContent>
       </Card>
 

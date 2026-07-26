@@ -3,6 +3,8 @@ const Listing = require("../listings/listing.model");
 const Order = require("./order.model");
 const inventoryService = require("../inventory/inventory.service");
 const OrderStatusHistory = require("./orderStatusHistory.model");
+const paginate = require("../../shared/utils/pagination");
+const getSort = require("../../shared/utils/sorting");
 
 /* -----------------------------------
 HELPERS
@@ -335,6 +337,25 @@ Pagination
 SELLER UPDATE ITEM STATUS
 ----------------------------------- */
 
+const recalculateOrderStatus = (order) => {
+  const statuses = order.items.map((item) => item.fulfillmentStatus);
+
+  // All delivered
+  if (statuses.every((status) => status === "DELIVERED")) {
+    order.status = "DELIVERED";
+    return;
+  }
+
+  // Every item has at least been shipped
+  if (statuses.every((status) => ["SHIPPED", "DELIVERED"].includes(status))) {
+    order.status = "SHIPPED";
+    return;
+  }
+
+  // Otherwise, order is confirmed
+  order.status = "CONFIRMED";
+};
+
 const updateOrderItemStatus = async (sellerId, orderId, itemId, newStatus) => {
   const allowedStatuses = ["NEW", "PACKING", "SHIPPED", "DELIVERED"];
 
@@ -395,6 +416,98 @@ const updateOrderItemStatus = async (sellerId, orderId, itemId, newStatus) => {
     item.deliveredAt = new Date();
   }
 
+  // Update parent order status
+  recalculateOrderStatus(order);
+  await order.save();
+
+  return order;
+};
+
+//admin
+// const getAdminOrders = async () => {
+//   return await Order.find({})
+//     .populate({
+//       path: "buyerId",
+//       select: "name email",
+//     })
+//     .select("_id buyerId totalAmount status items createdAt updatedAt")
+//     .sort({ createdAt: -1 });
+// };
+
+const getAdminOrders = async (queryParams) => {
+  const {
+    page = 1,
+    limit = 10,
+    sort = "latest",
+    status,
+  } = queryParams;
+
+  const query = {};
+
+  if (status) {
+    query.status = status;
+  }
+
+  const {
+    skip,
+    limit: pageSize,
+    pagination,
+  } = await paginate(Order, query, page, limit);
+
+  const orders = await Order.find(query)
+    .populate("buyerId", "name email")
+    .sort(getSort(sort))
+    .skip(skip)
+    .limit(pageSize);
+
+  return {
+    data: orders,
+    pagination,
+  };
+};
+
+const getAdminOrderById = async (orderId) => {
+  const order = await Order.findById(orderId)
+    .populate({
+      path: "buyerId",
+      select: "name email",
+    })
+    .populate({
+      path: "items.listingId",
+      populate: [
+        {
+          path: "productId",
+          select: "title description images",
+        },
+        {
+          path: "sellerId",
+          select: "name email shopName",
+        },
+      ],
+    });
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  return order;
+};
+
+const updateOrderStatus = async (orderId, status) => {
+  const allowedStatuses = ["PLACED", "CONFIRMED", "CANCELLED"];
+
+  if (!allowedStatuses.includes(status)) {
+    throw new Error("Invalid order status");
+  }
+
+  const order = await Order.findById(orderId);
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  order.status = status;
+
   await order.save();
 
   return order;
@@ -409,4 +522,8 @@ module.exports = {
 
   getSellerOrders,
   updateOrderItemStatus,
+
+  updateOrderStatus,
+  getAdminOrders,
+  getAdminOrderById,
 };

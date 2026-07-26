@@ -62,7 +62,9 @@ const orderSchema = new mongoose.Schema(
       enum: [
         "PLACED",
         "CONFIRMED",
-        "CANCELLED"
+        "CANCELLED",
+        "DELIVERED",
+        "SHIPPED"
       ],
       default: "PLACED"
     },

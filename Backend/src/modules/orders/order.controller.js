@@ -136,6 +136,79 @@ const getOrderItemTimeline = async (req, res) => {
   }
 };
 
+/* -----------------------------
+ADMIN
+------------------------------ */
+
+// const getAdminOrders = async (req, res) => {
+//   try {
+//     const data = await orderService.getAdminOrders(req.query);
+
+//     res.json({
+//       success: true,
+//       data,
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
+const getAdminOrders = async (req, res) => {
+  try {
+    const result = await orderService.getAdminOrders(req.query);
+
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getAdminOrderById = async (req, res) => {
+  try {
+    const data = await orderService.getAdminOrderById(req.params.id);
+
+    res.json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    const data = await orderService.updateOrderStatus(
+      req.params.id,
+      status
+    );
+
+    res.json({
+      success: true,
+      message: "Order updated successfully",
+      data,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   // buyer
   checkout,
@@ -147,4 +220,12 @@ module.exports = {
   getSellerOrders,
   updateOrderItemStatus,
   getOrderItemTimeline,
+
+  //admin
+  getAdminOrders,
+  getAdminOrderById,
+  updateOrderStatus
+
 };
+
+

@@ -74,6 +74,21 @@ const rejectBank = async (req, res) => {
   }
 };
 
+const getAllBankDetails = async (req, res) => {
+  try {
+    const result = await bankService.getAllBankDetails(req.query);
+
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   // seller
   submit,
@@ -82,4 +97,5 @@ module.exports = {
   // admin
   verifyBank,
   rejectBank,
+  getAllBankDetails,
 };

@@ -2,8 +2,13 @@ import api from "./api";
 
 import {
  SellerOrdersResponse,
- FulfillmentStatus
+ FulfillmentStatus,
+ OrderStatus,
+ GetAdminOrdersParams,
+ AdminOrdersResponse
 } from "@/types/order";
+
+
 
 
 /* =====================================
@@ -185,4 +190,43 @@ export const updateOrderItemStatus = async(
  );
 
  return res.data?.data || res.data;
+};
+
+/* =====================================
+ADMIN
+===================================== */
+
+export const getAdminOrders = async (
+  params: GetAdminOrdersParams
+): Promise<AdminOrdersResponse> => {
+  const res = await api.get<AdminOrdersResponse>(
+    "/orders/admin/orders",
+    {
+      params,
+    }
+  );
+
+  return res.data;
+};
+
+export const getAdminOrderById = async (
+  id: string
+) => {
+  const res = await api.get(
+    `/orders/admin/orders/${id}`
+  );
+
+  return res.data?.data;
+};
+
+export const updateAdminOrderStatus = async (
+  id: string,
+  status: OrderStatus
+) => {
+  const res = await api.patch(
+    `/orders/admin/orders/${id}/status`,
+    { status }
+  );
+
+  return res.data?.data;
 };

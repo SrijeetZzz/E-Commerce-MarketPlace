@@ -21,32 +21,32 @@ export default function SellerLayout({
   const pathname = usePathname();
 
   const navItems = [
-    {
-      name: "Dashboard",
-      href: "/seller/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      name: "Browse Products",
-      href: "/seller/products",
-      icon: PackageSearch,
-    },
-    {
-      name: "My Listings",
-      href: "/seller/listings",
-      icon: ListOrdered,
-    },
-    {
-      name: "My Orders",
-      href: "/seller/orders",
-      icon: ShoppingBag,
-    },
-    {
-      name: "Profile",
-      href: "/seller/profile",
-      icon: User,
-    },
-  ];
+  {
+    name: "Dashboard",
+    href: "/seller-dashboard/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    name: "Browse Products",
+    href: "/seller-dashboard/products",
+    icon: PackageSearch,
+  },
+  {
+    name: "My Listings",
+    href: "/seller-dashboard/listings",
+    icon: ListOrdered,
+  },
+  {
+    name: "My Orders",
+    href: "/seller-dashboard/orders",
+    icon: ShoppingBag,
+  },
+  {
+    name: "Profile",
+    href: "/seller-dashboard/profile",
+    icon: User,
+  },
+];
 
   return (
     <ProtectedRoute allowedRoles={["SELLER"]}>
